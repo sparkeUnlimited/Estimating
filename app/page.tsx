@@ -8,9 +8,12 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
+import Layout from "@/layout/Layout";
+
 const Home = () => {
   return (
-    <Paper sx={{ backgroundColor: "transparent", p: 4, mb: 4 }} elevation={3}>
+    <Layout title="Home">
+      <Paper sx={{ backgroundColor: "transparent", p: 4, mb: 4 }} elevation={3}>
       <Typography
         variant="h2"
         align="center"
@@ -145,7 +148,8 @@ const Home = () => {
           This is a dashboard for the GC to track progress.
         </Typography>
       </Box>
-    </Paper>
+      </Paper>
+    </Layout>
   );
 };
 
