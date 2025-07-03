@@ -19,7 +19,7 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import InfoIcon from "@mui/icons-material/Info";
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport"; */
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import WorkIcon from "@mui/icons-material/Work";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import SafetyCheckIcon from "@mui/icons-material/HealthAndSafety";
@@ -49,6 +49,8 @@ const pageIcons = {
 
 export default function Nav() {
   const router = useRouter();
+  const pathname = usePathname();
+  const isEstimate = pathname === "/" || pathname === "/estimate";
 
   const pages = [...basePages] as string[];
 
@@ -128,11 +130,15 @@ export default function Nav() {
                     border: page === "Contact Us" ? "2px solid transparent" : "none",
                     position: "relative",
                     overflow: "hidden",
-                    pointerEvents: page === "Promotions" ? "none" : "auto",
-                    opacity: page === "Promotions" ? 0.5 : 1,
+                    pointerEvents:
+                      page === "Promotions" || (page === "Estimate" && isEstimate)
+                        ? "none"
+                        : "auto",
+                    opacity: page === "Promotions" || (page === "Estimate" && isEstimate) ? 0.5 : 1,
                   }}
                   key={page}
                   onClick={() => {
+                    if (page === "Estimate" && isEstimate) return;
                     handleCloseNavMenu(); // Close the menu
                     router.push(pageRoutes[page]); // Navigate to the desired page
                   }}
@@ -164,13 +170,17 @@ export default function Nav() {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={() => router.push(pageRoutes[page])}
+                onClick={() => {
+                  if (page === "Estimate" && isEstimate) return;
+                  router.push(pageRoutes[page]);
+                }}
                 sx={{
                   my: 3,
                   color: page === "Contact Us" ? "black" : "white",
                   fontWeight: 800,
                   display: "flex",
-                  pointerEvents: page === "Promotions" ? "none" : "auto",
+                  pointerEvents:
+                    page === "Promotions" || (page === "Estimate" && isEstimate) ? "none" : "auto",
                   background:
                     page === "Contact Us"
                       ? "linear-gradient(to right, #f59e0b, #ea580c, #fbbf24)"
@@ -180,7 +190,7 @@ export default function Nav() {
                   position: "relative",
                   overflow: "hidden",
                   padding: "2px 6px",
-                  opacity: page === "Promotions" ? 0.5 : 1,
+                  opacity: page === "Promotions" || (page === "Estimate" && isEstimate) ? 0.5 : 1,
                 }}
                 startIcon={pageIcons[page]}
               >
