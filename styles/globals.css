@@ -29,9 +29,12 @@
 }
 
 .main {
-  width: 100vw;
-  min-height: 100vh;
-  position: fixed;
+  width: 100%;
+  min-height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
   padding: 120px 24px 160px 24px;
