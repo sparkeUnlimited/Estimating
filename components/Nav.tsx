@@ -52,6 +52,8 @@ export default function Nav() {
   const pathname = usePathname();
   const isEstimate = pathname === "/" || pathname === "/estimate";
 
+  const pmDomain = "https://pm.sparkeunlimited.ca";
+
   const pages = [...basePages] as string[];
 
   const pageRoutes = {
@@ -137,10 +139,15 @@ export default function Nav() {
                     opacity: page === "Promotions" || (page === "Estimate" && isEstimate) ? 0.5 : 1,
                   }}
                   key={page}
-                  onClick={() => {
-                    if (page === "Estimate" && isEstimate) return;
-                    handleCloseNavMenu(); // Close the menu
-                    router.push(pageRoutes[page]); // Navigate to the desired page
+                onClick={() => {
+                    if (page === "Estimate") {
+                      if (isEstimate) return;
+                      handleCloseNavMenu();
+                      router.push(pageRoutes[page]);
+                    } else {
+                      handleCloseNavMenu();
+                      window.location.href = `${pmDomain}${pageRoutes[page]}`;
+                    }
                   }}
                 >
                   {pageIcons[page]}
@@ -157,7 +164,9 @@ export default function Nav() {
               justifyContent: "space-between",
             }}
           >
-            <Button onClick={() => router.push(pageRoutes.Home)}>
+            <Button onClick={() => {
+              window.location.href = `${pmDomain}`;
+            }}>
               <Image
                 src="/assets/img/Sparke_Full_Logo.png"
                 alt="logo"
@@ -171,8 +180,12 @@ export default function Nav() {
               <Button
                 key={page}
                 onClick={() => {
-                  if (page === "Estimate" && isEstimate) return;
-                  router.push(pageRoutes[page]);
+                  if (page === "Estimate") {
+                    if (isEstimate) return;
+                    router.push(pageRoutes[page]);
+                  } else {
+                    window.location.href = `${pmDomain}${pageRoutes[page]}`;
+                  }
                 }}
                 sx={{
                   my: 3,
