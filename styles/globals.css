@@ -10,11 +10,8 @@
   top: 0;
   z-index: 1000;
   width: 100vw;
-  background-image: radial-gradient(
-      at 27% 37%,
-      hsla(215, 98%, 61%, 1) 0px,
-      transparent 0%
-    ),
+  background-image:
+    radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%),
     radial-gradient(at 97% 21%, hsla(125, 98%, 72%, 1) 0px, transparent 50%),
     radial-gradient(at 52% 99%, hsla(354, 98%, 61%, 1) 0px, transparent 50%),
     radial-gradient(at 10% 29%, hsla(256, 96%, 67%, 1) 0px, transparent 50%),
@@ -43,7 +40,7 @@
 
 .main:before {
   background-color: black;
-  background: radial-gradient(circle, rgba(2, 0, 10, 0.8) 0, black 100%); 
+  background: radial-gradient(circle, rgba(2, 0, 10, 0.8) 0, black 100%);
   position: absolute;
   content: "";
   z-index: 2;
@@ -52,17 +49,13 @@
   top: 0;
 }
 
-
 .gradient {
   height: fit-content;
   z-index: 3;
   width: 100%;
   max-width: 640px;
-  background-image: radial-gradient(
-      at 27% 37%,
-      hsla(215, 98%, 61%, 1) 0px,
-      transparent 0%
-    ),
+  background-image:
+    radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%),
     radial-gradient(at 97% 21%, hsla(125, 98%, 72%, 1) 0px, transparent 50%),
     radial-gradient(at 52% 99%, hsla(354, 98%, 61%, 1) 0px, transparent 50%),
     radial-gradient(at 10% 29%, hsla(256, 96%, 67%, 1) 0px, transparent 50%),
@@ -202,6 +195,6 @@
   @apply flex justify-between items-center;
 }
 
-.footer_design{
+.footer_design {
   @apply text-sm bg-zinc-400 mb-6 font-medium;
 }
