@@ -139,7 +139,7 @@ export default function Nav() {
                     opacity: page === "Promotions" || (page === "Estimate" && isEstimate) ? 0.5 : 1,
                   }}
                   key={page}
-                onClick={() => {
+                  onClick={() => {
                     if (page === "Estimate") {
                       if (isEstimate) return;
                       handleCloseNavMenu();
@@ -164,9 +164,11 @@ export default function Nav() {
               justifyContent: "space-between",
             }}
           >
-            <Button onClick={() => {
-              window.location.href = `${pmDomain}`;
-            }}>
+            <Button
+              onClick={() => {
+                window.location.href = `${pmDomain}`;
+              }}
+            >
               <Image
                 src="/assets/img/Sparke_Full_Logo.png"
                 alt="logo"

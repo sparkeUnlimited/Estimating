@@ -49,12 +49,7 @@ const formatPostalCode = (value: string) => {
   return last ? `${first} ${last}` : first;
 };
 
-const serviceOptions = [
-  "Pot Lights",
-  "Receptacles",
-  "Strip Lights",
-  "Panel Maintenance",
-] as const;
+const serviceOptions = ["Pot Lights", "Receptacles", "Strip Lights", "Panel Maintenance"] as const;
 
 export type EstimateRow = {
   serviceId?: string;
@@ -104,20 +99,10 @@ const EstimateForm = () => {
   }, []);
 
   const customerValid =
-    fullName &&
-    address &&
-    city &&
-    province &&
-    postalCode &&
-    contactMethod &&
-    phone &&
-    email;
+    fullName && address && city && province && postalCode && contactMethod && phone && email;
 
   const addLabourRow = () => {
-    setLabourRows((r) => [
-      ...r,
-      { labourUnits: 0, labourRate: 0, unit: "Each", serviceName: "" },
-    ]);
+    setLabourRows((r) => [...r, { labourUnits: 0, labourRate: 0, unit: "Each", serviceName: "" }]);
   };
 
   const removeLabourRow = (idx: number) => {
@@ -140,13 +125,10 @@ const EstimateForm = () => {
     setMaterialRows((r) => r.map((item, i) => (i === idx ? { ...item, ...row } : item)));
   };
 
-  const labourHours = labourRows.reduce(
-    (sum, r) => sum + r.labourUnits / unitDivisor[r.unit],
-    0,
-  );
+  const labourHours = labourRows.reduce((sum, r) => sum + r.labourUnits / unitDivisor[r.unit], 0);
   const labourCost = labourRows.reduce(
     (sum, r) => sum + (r.labourUnits * r.labourRate) / unitDivisor[r.unit],
-    0,
+    0
   );
   const labourMinMultiplier = labourHours > 0 && labourHours < 2 ? 2 / labourHours : 1;
   const labourSum = labourCost * labourMinMultiplier;
@@ -158,14 +140,12 @@ const EstimateForm = () => {
   );
   const totalMaterial = materialSum;
 
-
   const baseCost = totalLabour + totalMaterial;
   const markupAmt = baseCost * (markup / 100);
   const overheadAmt = baseCost * (overhead / 100);
   const cost = baseCost + markupAmt + overheadAmt;
   const warranty = cost * 0.03;
   const subtotal = cost + warranty + esaFee + hydroFee;
-
 
   const discountAmt =
     discountType === "Dollar"
@@ -312,8 +292,6 @@ const EstimateForm = () => {
               />
             </Stack>
           </Box>
-
-
 
           {customerValid && (
             <>

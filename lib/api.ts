@@ -1,4 +1,3 @@
-
 export const sendEstimateEmail = async (data: any, pdf: Blob) => {
   console.log("Sending estimate email...", data, pdf);
 };
