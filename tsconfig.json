@@ -10,6 +10,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
+    "types": [],
     "noEmit": true,
     "incremental": true,
     /* Module Resolution */
