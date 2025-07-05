@@ -1,7 +1,6 @@
 import "/styles/globals.css";
 import "/styles/calendar.css";
 
-
 export const metadata = {
   title: "Estimating App - Spark-E",
   description:
