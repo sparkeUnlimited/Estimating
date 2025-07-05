@@ -1,6 +1,6 @@
 import { Box, Container } from "@mui/material";
 import Head from "next/head";
-import Nav from "@/components/Nav"; // make sure this exists or replace with your nav
+import Nav from "@/components/Nav";
 import { ReactNode } from "react";
 
 type LayoutProps = {
@@ -12,7 +12,7 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
   return (
     <>
       <Head>
-        <title>{`${title} | Estimating Tool`}</title>
+        <title>{`${title} | Spark-E`}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -56,10 +56,10 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
 
       {/* Main Content Container */}
       <Container
-        maxWidth="lg"
+        maxWidth="xl"
         sx={{
           position: "relative",
-          zIndex: 10,
+
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -70,7 +70,7 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
         }}
       >
         <Nav />
-        <Box sx={{ flexGrow: 1, width: "100%", py: 4 }}>{children}</Box>
+        <Box sx={{ flexGrow: 1, width: "100%"}}>{children}</Box>
       </Container>
     </>
   );

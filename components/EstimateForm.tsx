@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -330,8 +331,8 @@ const EstimateForm = () => {
                       row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
                     const lc = labourExt * labourRate;
                     return (
-                      <>
-                        <TableRow key={`name-${idx}`}>
+                      <React.Fragment key={`row-${idx}`}>
+                        <TableRow >
                           <TableCell colSpan={9} sx={{ p: 0 }}>
                             <TextField
                               size="small"
@@ -358,7 +359,7 @@ const EstimateForm = () => {
                           <TableCell>Labour Cost</TableCell>
                           <TableCell />
                         </TableRow>
-                        <TableRow key={idx}>
+                        <TableRow >
                           <TableCell sx={{ pl: 0 }}>
                             <TextField
                               size="small"
@@ -431,7 +432,7 @@ const EstimateForm = () => {
                             />
                           </TableCell>
                         </TableRow>
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </TableBody>

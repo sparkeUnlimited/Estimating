@@ -78,7 +78,7 @@ export default function Nav() {
   };
 
   return (
-    <AppBar sx={{ backgroundColor: "inherit" }} position="static">
+    <AppBar sx={{ backgroundColor: "black" }} position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box
