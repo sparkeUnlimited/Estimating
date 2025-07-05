@@ -11,6 +11,7 @@ import {
   Radio,
   Table,
   TableHead,
+  TableFooter,
   TableBody,
   TableRow,
   TableCell,
@@ -48,7 +49,6 @@ const formatPostalCode = (value: string) => {
   return last ? `${first} ${last}` : first;
 };
 
-
 export type EstimateRow = {
   name: string;
   quantity: number;
@@ -61,7 +61,6 @@ export type EstimateRow = {
 const unitDivisor = { Each: 1, C: 100, M: 1000 } as const;
 
 const EstimateForm = () => {
-
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
@@ -96,14 +95,7 @@ const EstimateForm = () => {
   }, [workType]);
 
   const customerValid =
-    fullName &&
-    address &&
-    city &&
-    province &&
-    postalCode &&
-    contactMethod &&
-    phone &&
-    email;
+    fullName && address && city && province && postalCode && contactMethod && phone && email;
 
   const addRow = () => {
     setRows((r) => [
@@ -337,11 +329,9 @@ const EstimateForm = () => {
                 </TableHead>
                 <TableBody>
                   {rows.map((row, idx) => {
-                    const materialExt =
-                      row.quantity * (row.unitCost / unitDivisor[row.unit]);
+                    const materialExt = row.quantity * (row.unitCost / unitDivisor[row.unit]);
                     const labourExt =
-                      row.quantity *
-                      (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
+                      row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
                     const lc = labourExt * labourRate;
                     return (
                       <TableRow key={idx}>
@@ -357,9 +347,7 @@ const EstimateForm = () => {
                             size="small"
                             type="number"
                             value={row.quantity}
-                            onChange={(e) =>
-                              updateRow(idx, { quantity: Number(e.target.value) })
-                            }
+                            onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
                           />
                         </TableCell>
                         <TableCell>
@@ -367,18 +355,14 @@ const EstimateForm = () => {
                             size="small"
                             type="number"
                             value={row.unitCost}
-                            onChange={(e) =>
-                              updateRow(idx, { unitCost: Number(e.target.value) })
-                            }
+                            onChange={(e) => updateRow(idx, { unitCost: Number(e.target.value) })}
                           />
                         </TableCell>
                         <TableCell>
                           <Select
                             size="small"
                             value={row.unit}
-                            onChange={(e) =>
-                              updateRow(idx, { unit: e.target.value as any })
-                            }
+                            onChange={(e) => updateRow(idx, { unit: e.target.value as any })}
                           >
                             <MenuItem value="Each">Each</MenuItem>
                             <MenuItem value="C">C</MenuItem>
@@ -391,9 +375,7 @@ const EstimateForm = () => {
                             size="small"
                             type="number"
                             value={row.labourUnit}
-                            onChange={(e) =>
-                              updateRow(idx, { labourUnit: Number(e.target.value) })
-                            }
+                            onChange={(e) => updateRow(idx, { labourUnit: Number(e.target.value) })}
                           />
                         </TableCell>
                         <TableCell>
@@ -422,32 +404,63 @@ const EstimateForm = () => {
                     );
                   })}
                 </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <Typography fontWeight="bold">Total Material Cost</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell colSpan={5} />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <Typography fontWeight="bold">Total Labour Extension</Typography>
+                    </TableCell>
+                    <TableCell colSpan={4} />
+                    <TableCell>
+                      <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell colSpan={1} />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <Typography fontWeight="bold">Total Labour Cost</Typography>
+                    </TableCell>
+                    <TableCell colSpan={4} />
+                    <TableCell>
+                      <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell colSpan={1} />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={2}>
+                      <Typography variant="h6" fontWeight="bold">
+                        Total Cost
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="h6" fontWeight="bold">
+                        {baseCost.toFixed(2)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell colSpan={7} />
+                  </TableRow>
+                </TableFooter>
               </Table>
               <Box textAlign="right" my={1}>
                 <IconButton onClick={addRow} size="small">
                   <AddIcon />
                 </IconButton>
               </Box>
-              <Table size="small">
-                <TableBody>
-                  <TableRow>
-                    <TableCell colSpan={4} />
-                    <TableCell>{materialSum.toFixed(2)}</TableCell>
-                    <TableCell colSpan={2} />
-                    <TableCell>{labourExtensionSum.toFixed(2)}</TableCell>
-                    <TableCell />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={7} />
-                    <TableCell>{totalLabourCost.toFixed(2)}</TableCell>
-                    <TableCell />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={8} />
-                    <TableCell>{(totalMaterial + totalLabourCost).toFixed(2)} CAD</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
 
               <Typography variant="h6" fontWeight="bold" mt={4}>
                 Totals

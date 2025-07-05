@@ -29,7 +29,7 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
         }}
         className="main"
       >
-        Radial Gradient Background
+        {/* Radial Gradient Background */}
         <Box
           sx={{
             zIndex: 3,
