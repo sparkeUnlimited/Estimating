@@ -145,7 +145,7 @@ const EstimateForm = () => {
   const totalLabourCost = labourExtensionSum * labourRate;
   const totalMaterial = materialSum;
   const baseCost = totalMaterial + totalLabourCost;
-  const markupAmt = baseCost * (markup / 100);
+  const markupAmt = totalMaterial * (markup / 100);
   const overheadAmt = baseCost * (overhead / 100);
   const cost = baseCost + markupAmt + overheadAmt;
   const warrantyAmt = cost * 0.03;
