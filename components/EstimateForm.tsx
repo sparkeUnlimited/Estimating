@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Box,
   Button,
+  Divider,
   Paper,
   Stack,
   TextField,
@@ -322,19 +323,6 @@ const EstimateForm = () => {
 
               
               <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Material Quantity</TableCell>
-                    <TableCell >Material Unit Cost</TableCell>
-                    <TableCell>Material Unit Multiplier</TableCell>
-                    <TableCell>Material Extension</TableCell>
-                    <TableCell>Labour Unit</TableCell>
-                    <TableCell>Labour Unit Multiplier</TableCell>
-                    <TableCell>Labour Extension</TableCell>
-                    <TableCell>Labour Cost</TableCell>
-                    <TableCell />
-                  </TableRow>
-                </TableHead>
                 <TableBody>
                   {rows.map((row, idx) => {
                     const materialExt = row.quantity * (row.unitCost / unitDivisor[row.unit]);
@@ -344,7 +332,7 @@ const EstimateForm = () => {
                     return (
                       <>
                         <TableRow key={`name-${idx}`}>
-                          <TableCell colSpan={9}>
+                          <TableCell colSpan={9} sx={{ p: 0 }}>
                             <TextField
                               size="small"
                               label="Material Name"
@@ -359,8 +347,19 @@ const EstimateForm = () => {
                             />
                           </TableCell>
                         </TableRow>
+                        <TableRow>
+                          <TableCell>Material Quantity</TableCell>
+                          <TableCell >Material Unit Cost</TableCell>
+                          <TableCell>Material Unit Multiplier</TableCell>
+                          <TableCell>Material Extension</TableCell>
+                          <TableCell>Labour Unit</TableCell>
+                          <TableCell>Labour Unit Multiplier</TableCell>
+                          <TableCell>Labour Extension</TableCell>
+                          <TableCell>Labour Cost</TableCell>
+                          <TableCell />
+                        </TableRow>
                         <TableRow key={idx}>
-                          <TableCell>
+                          <TableCell sx={{ pl: 0 }}>
                             <TextField
                               size="small"
                               type="number"
@@ -422,6 +421,16 @@ const EstimateForm = () => {
                             </IconButton>
                           </TableCell>
                         </TableRow>
+                        <TableRow>
+                          <TableCell colSpan={9} sx={{ px: 0 }}>
+                            <Divider
+                              sx={{
+                                borderBottom: "2px solid blue",
+                                height: "1px",
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
                       </>
                     );
                   })}
@@ -466,7 +475,6 @@ const EstimateForm = () => {
                         {baseCost.toFixed(2)}
                       </Typography>
                     </TableCell>
-                    <TableCell />
                   </TableRow>
                 </TableFooter>
               </Table>
@@ -617,7 +625,7 @@ const EstimateForm = () => {
                 </TableFooter>
             </Table>
               
-              <Typography variant="h6" fontWeight="bold">
+              <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
               <Button type="submit" variant="contained">
