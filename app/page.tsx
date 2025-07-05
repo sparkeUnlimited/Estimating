@@ -5,10 +5,8 @@ import EstimateForm from "@/components/EstimateForm";
 const Home = () => {
   return (
     <Layout title="Estimating">
-      <EstimateForm />  
+      <EstimateForm />
     </Layout>
-      
-   
   );
 };
 

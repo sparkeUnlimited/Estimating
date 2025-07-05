@@ -70,7 +70,7 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
         }}
       >
         <Nav />
-        <Box sx={{ flexGrow: 1, width: "100%"}}>{children}</Box>
+        <Box sx={{ flexGrow: 1, width: "100%" }}>{children}</Box>
       </Container>
     </>
   );
