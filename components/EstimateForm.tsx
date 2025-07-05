@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -70,6 +71,7 @@ const EstimateForm = () => {
   const [contactMethod, setContactMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+ 
 
   const [rows, setRows] = useState<EstimateRow[]>([
     {
@@ -102,8 +104,10 @@ const EstimateForm = () => {
   }
 }, [workType]);
 
-  const customerValid =
+  const allFieldsFilled =
     fullName && address && city && province && postalCode && contactMethod && phone && email;
+
+  const customerValid = allFieldsFilled && workType !== "Select Type"; 
 
   const addRow = () => {
     setRows((r) => [
@@ -291,11 +295,7 @@ const EstimateForm = () => {
                 fullWidth
               />
             </Stack>
-          </Box>
-
-          {customerValid && (
-            <>
-              <Typography variant="h6" fontWeight="bold" mt={2}>
+            <Typography variant="h6" fontWeight="bold" mt={2}>
                 Estimate Items
               </Typography>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
@@ -321,6 +321,11 @@ const EstimateForm = () => {
                 />
               </Stack>
 
+          </Box>
+
+          {customerValid && (
+            <>
+              
               
               <Table size="small">
                 <TableBody>
@@ -330,8 +335,8 @@ const EstimateForm = () => {
                       row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
                     const lc = labourExt * labourRate;
                     return (
-                      <>
-                        <TableRow key={`name-${idx}`}>
+                       <React.Fragment key={`row-${idx}`}>
+                        <TableRow >
                           <TableCell colSpan={9} sx={{ p: 0 }}>
                             <TextField
                               size="small"
@@ -358,7 +363,7 @@ const EstimateForm = () => {
                           <TableCell>Labour Cost</TableCell>
                           <TableCell />
                         </TableRow>
-                        <TableRow key={idx}>
+                        <TableRow >
                           <TableCell sx={{ pl: 0 }}>
                             <TextField
                               size="small"
@@ -431,7 +436,7 @@ const EstimateForm = () => {
                             />
                           </TableCell>
                         </TableRow>
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </TableBody>
