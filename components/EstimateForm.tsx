@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import React from 'react';
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
+  Divider,
   Paper,
   Stack,
   TextField,
@@ -11,6 +13,7 @@ import {
   Radio,
   Table,
   TableHead,
+  TableFooter,
   TableBody,
   TableRow,
   TableCell,
@@ -23,7 +26,6 @@ import {
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { getServices, ServiceItem } from "@/lib/msLists";
 import { sendEstimateEmail, ensureCustomerFolder } from "@/lib/api";
 
 const provinces = [
@@ -49,28 +51,18 @@ const formatPostalCode = (value: string) => {
   return last ? `${first} ${last}` : first;
 };
 
-const serviceOptions = ["Pot Lights", "Receptacles", "Strip Lights", "Panel Maintenance"] as const;
-
 export type EstimateRow = {
-  serviceId?: string;
-  serviceName?: string;
-  labourUnits: number;
-  labourRate: number;
-  unit: "Each" | "C" | "M";
-};
-
-export type MaterialRow = {
   name: string;
-  units: number;
+  quantity: number;
   unitCost: number;
   unit: "Each" | "C" | "M";
+  labourUnit: number;
+  labourUnitMultiplier: "Each" | "C" | "M";
 };
 
 const unitDivisor = { Each: 1, C: 100, M: 1000 } as const;
 
 const EstimateForm = () => {
-  const [services, setServices] = useState<ServiceItem[]>([]);
-
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
@@ -79,73 +71,84 @@ const EstimateForm = () => {
   const [contactMethod, setContactMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+ 
 
-  const [labourRows, setLabourRows] = useState<EstimateRow[]>([
-    { labourUnits: 0, labourRate: 0, unit: "Each", serviceName: "" },
+  const [rows, setRows] = useState<EstimateRow[]>([
+    {
+      name: "",
+      quantity: 0,
+      unitCost: 0,
+      unit: "Each",
+      labourUnit: 0,
+      labourUnitMultiplier: "Each",
+    },
   ]);
-  const [materialRows, setMaterialRows] = useState<MaterialRow[]>([
-    { name: "", units: 0, unitCost: 0, unit: "Each" },
-  ]);
+  const [workType, setWorkType] = useState("Select Type");
+  const [labourRate, setLabourRate] = useState(125);
 
   const [markup, setMarkup] = useState(30);
-  const [overhead, setOverhead] = useState(25);
+  const [overhead, setOverhead] = useState(10);
+  const [warranty, setWarranty] = useState(3);
   const [esaFee, setEsaFee] = useState(0);
   const [hydroFee, setHydroFee] = useState(0);
   const [discountType, setDiscountType] = useState("None");
   const [discountValue, setDiscountValue] = useState(0);
 
   useEffect(() => {
-    getServices().then(setServices);
-  }, []);
+  if (workType === "Residential") {
+    setLabourRate(125);
+  } else if (workType === "Commercial") {
+    setLabourRate(145);
+  } else {
+    setLabourRate(0); // Default or unrecognized type
+  }
+}, [workType]);
 
-  const customerValid =
+  const allFieldsFilled =
     fullName && address && city && province && postalCode && contactMethod && phone && email;
 
-  const addLabourRow = () => {
-    setLabourRows((r) => [...r, { labourUnits: 0, labourRate: 0, unit: "Each", serviceName: "" }]);
+  const customerValid = allFieldsFilled && workType !== "Select Type"; 
+
+  const addRow = () => {
+    setRows((r) => [
+      ...r,
+      {
+        name: "",
+        quantity: 0,
+        unitCost: 0,
+        unit: "Each",
+        labourUnit: 0,
+        labourUnitMultiplier: "Each",
+      },
+    ]);
   };
 
-  const removeLabourRow = (idx: number) => {
-    setLabourRows((r) => r.filter((_, i) => i !== idx));
+  const removeRow = (idx: number) => {
+    setRows((r) => r.filter((_, i) => i !== idx));
   };
 
-  const updateLabourRow = (idx: number, row: Partial<EstimateRow>) => {
-    setLabourRows((r) => r.map((item, i) => (i === idx ? { ...item, ...row } : item)));
+  const updateRow = (idx: number, row: Partial<EstimateRow>) => {
+    setRows((r) => r.map((item, i) => (i === idx ? { ...item, ...row } : item)));
   };
 
-  const addMaterialRow = () => {
-    setMaterialRows((r) => [...r, { name: "", units: 0, unitCost: 0, unit: "Each" }]);
-  };
-
-  const removeMaterialRow = (idx: number) => {
-    setMaterialRows((r) => r.filter((_, i) => i !== idx));
-  };
-
-  const updateMaterialRow = (idx: number, row: Partial<MaterialRow>) => {
-    setMaterialRows((r) => r.map((item, i) => (i === idx ? { ...item, ...row } : item)));
-  };
-
-  const labourHours = labourRows.reduce((sum, r) => sum + r.labourUnits / unitDivisor[r.unit], 0);
-  const labourCost = labourRows.reduce(
-    (sum, r) => sum + (r.labourUnits * r.labourRate) / unitDivisor[r.unit],
+  const materialSum = rows.reduce(
+    (sum, r) => sum + r.quantity * (r.unitCost / unitDivisor[r.unit]),
     0
   );
-  const labourMinMultiplier = labourHours > 0 && labourHours < 2 ? 2 / labourHours : 1;
-  const labourSum = labourCost * labourMinMultiplier;
-  const totalLabour = labourSum;
 
-  const materialSum = materialRows.reduce(
-    (sum, r) => sum + r.units * (r.unitCost / unitDivisor[r.unit]),
+  const labourExtensionSum = rows.reduce(
+    (sum, r) => sum + r.quantity * (r.labourUnit / unitDivisor[r.labourUnitMultiplier]),
     0
   );
+
+  const totalLabourCost = labourExtensionSum * labourRate;
   const totalMaterial = materialSum;
-
-  const baseCost = totalLabour + totalMaterial;
+  const baseCost = totalMaterial + totalLabourCost;
   const markupAmt = baseCost * (markup / 100);
   const overheadAmt = baseCost * (overhead / 100);
   const cost = baseCost + markupAmt + overheadAmt;
-  const warranty = cost * 0.03;
-  const subtotal = cost + warranty + esaFee + hydroFee;
+  const warrantyAmt = cost * 0.03;
+  const subtotal = cost + warrantyAmt + esaFee + hydroFee;
 
   const discountAmt =
     discountType === "Dollar"
@@ -169,8 +172,9 @@ const EstimateForm = () => {
         phone,
         email,
       },
-      labourRows,
-      materialRows,
+      workType,
+      labourRate,
+      rows,
       markup,
       overhead,
       esaFee,
@@ -178,15 +182,15 @@ const EstimateForm = () => {
       discountType,
       discountValue,
       totals: {
-        labourSum,
         materialSum,
-        totalLabour,
+        labourExtensionSum,
+        totalLabourCost,
         totalMaterial,
         baseCost,
         markupAmt,
         overheadAmt,
         cost,
-        warranty,
+        warrantyAmt,
         discountAmt,
         grandTotal,
       },
@@ -291,249 +295,342 @@ const EstimateForm = () => {
                 fullWidth
               />
             </Stack>
+            <Typography variant="h6" fontWeight="bold" mt={2}>
+                Estimate Items
+              </Typography>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+                <FormControl size="small">
+                  <InputLabel id="wt">Work Type</InputLabel>
+                  <Select
+                    labelId="wt"
+                    label="Work Type"
+                    value={workType}
+                    onChange={(e) => setWorkType(e.target.value)}
+                  >
+                    <MenuItem value="Select Type">Select Type</MenuItem>
+                    <MenuItem value="Residential">Residential</MenuItem>
+                    <MenuItem value="Commercial">Commercial</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  label="Labour Rate"
+                  size="small"
+                  type="number"
+                  value={labourRate}
+                  onChange={(e) => setLabourRate(Number(e.target.value))}
+                />
+              </Stack>
+
           </Box>
 
           {customerValid && (
             <>
-              <Typography variant="h6" fontWeight="bold">
-                Labour
-              </Typography>
+              
+              
               <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Work Type</TableCell>
-                    <TableCell>Services</TableCell>
-                    <TableCell>Labour Units</TableCell>
-                    <TableCell>Labour Rate</TableCell>
-                    <TableCell>Unit Amount</TableCell>
-                    <TableCell>Extension</TableCell>
-                    <TableCell />
-                  </TableRow>
-                </TableHead>
                 <TableBody>
-                  {labourRows.map((row, idx) => {
-                    const service = services.find((s) => s.id === row.serviceId);
-                    const rate = service ? service.labourRate : row.labourRate;
-                    const units = row.labourUnits;
-                    const divisor = unitDivisor[row.unit];
-                    const ext = (units * rate) / divisor;
+                  {rows.map((row, idx) => {
+                    const materialExt = row.quantity * (row.unitCost / unitDivisor[row.unit]);
+                    const labourExt =
+                      row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
+                    const lc = labourExt * labourRate;
                     return (
-                      <TableRow key={idx}>
-                        <TableCell>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>Work Type</InputLabel>
+                       <React.Fragment key={`row-${idx}`}>
+                        <TableRow >
+                          <TableCell colSpan={9} sx={{ p: 0 }}>
+                            <TextField
+                              size="small"
+                              label="Material Name"
+                              fullWidth
+                              value={row.name}
+                              onChange={(e) => updateRow(idx, { name: e.target.value })}
+                              slotProps={{
+                                input: {
+                                  inputProps: { maxLength: 255 },
+                                },
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>Material Quantity</TableCell>
+                          <TableCell >Material Unit Cost</TableCell>
+                          <TableCell>Material Unit Multiplier</TableCell>
+                          <TableCell>Material Extension</TableCell>
+                          <TableCell>Labour Unit</TableCell>
+                          <TableCell>Labour Unit Multiplier</TableCell>
+                          <TableCell>Labour Extension</TableCell>
+                          <TableCell>Labour Cost</TableCell>
+                          <TableCell />
+                        </TableRow>
+                        <TableRow >
+                          <TableCell sx={{ pl: 0 }}>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.quantity}
+                              onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
+                            />
+                          </TableCell>
+                          <TableCell >
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.unitCost}
+                              onChange={(e) => updateRow(idx, { unitCost: Number(e.target.value) })}
+                            />
+                          </TableCell>
+
+                          <TableCell>
                             <Select
-                              value={row.serviceId || ""}
-                              label="Work Type"
+                              size="small"
+                              value={row.unit}
+                              onChange={(e) => updateRow(idx, { unit: e.target.value as any })}
+                            >
+                              <MenuItem value="Each">Each</MenuItem>
+                              <MenuItem value="C">C</MenuItem>
+                              <MenuItem value="M">M</MenuItem>
+                            </Select>
+                          </TableCell>
+                          <TableCell>{materialExt.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.labourUnit}
                               onChange={(e) =>
-                                updateLabourRow(idx, {
-                                  serviceId: e.target.value,
-                                  labourRate:
-                                    services.find((s) => s.id === e.target.value)?.labourRate || 0,
+                                updateRow(idx, { labourUnit: Number(e.target.value) })
+                              }
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              size="small"
+                              value={row.labourUnitMultiplier}
+                              onChange={(e) =>
+                                updateRow(idx, {
+                                  labourUnitMultiplier: e.target.value as any,
                                 })
                               }
                             >
-                              {services.map((s) => (
-                                <MenuItem key={s.id} value={s.id}>
-                                  {s.name}
-                                </MenuItem>
-                              ))}
+                              <MenuItem value="Each">Each</MenuItem>
+                              <MenuItem value="C">C</MenuItem>
+                              <MenuItem value="M">M</MenuItem>
                             </Select>
-                          </FormControl>
-                        </TableCell>
-                        <TableCell>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>Services</InputLabel>
-                            <Select
-                              value={row.serviceName || ""}
-                              label="Services"
-                              onChange={(e) =>
-                                updateLabourRow(idx, { serviceName: e.target.value })
-                              }
-                            >
-                              {serviceOptions.map((opt) => (
-                                <MenuItem key={opt} value={opt}>
-                                  {opt}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={units}
-                            onChange={(e) =>
-                              updateLabourRow(idx, { labourUnits: Number(e.target.value) })
-                            }
-                          />
-                        </TableCell>
-                        <TableCell>{rate}</TableCell>
-                        <TableCell>
-                          <Select
-                            size="small"
-                            value={row.unit}
-                            onChange={(e) => updateLabourRow(idx, { unit: e.target.value as any })}
-                          >
-                            <MenuItem value="Each">Each</MenuItem>
-                            <MenuItem value="C">C</MenuItem>
-                            <MenuItem value="M">M</MenuItem>
-                          </Select>
-                        </TableCell>
-                        <TableCell>{ext.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <IconButton onClick={() => removeLabourRow(idx)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
+                          </TableCell>
+                          <TableCell>{labourExt.toFixed(2)}</TableCell>
+                          <TableCell>{lc.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <IconButton onClick={() => removeRow(idx)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell colSpan={9} sx={{ px: 0 }}>
+                            <Divider
+                              sx={{
+                                borderBottom: "2px solid blue",
+                                height: "1px",
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
                     );
                   })}
                 </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell colSpan={3}>
+                      <Typography fontWeight="bold">Total Material Cost</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell colSpan={5} />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={6}>
+                      <Typography fontWeight="bold">Total Labour Extension</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell colSpan={2} />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Typography fontWeight="bold">Total Labour Cost</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell  />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <Typography variant="h6" fontWeight="bold">
+                        Total Cost
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="h6" fontWeight="bold">
+                        {baseCost.toFixed(2)}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
               </Table>
               <Box textAlign="right" my={1}>
-                <IconButton onClick={addLabourRow} size="small">
+                <IconButton onClick={addRow} size="small">
                   <AddIcon />
                 </IconButton>
               </Box>
-              <Typography>Labour Sum: {labourSum.toFixed(2)}</Typography>
-              <Typography>Total Labour: {totalLabour.toFixed(2)}</Typography>
-
-              <Typography variant="h6" fontWeight="bold" mt={4}>
-                Material
-              </Typography>
-              <Table size="small">
+              <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Units</TableCell>
-                    <TableCell>Unit Cost</TableCell>
-                    <TableCell>Unit Multiplier</TableCell>
-                    <TableCell>Extension</TableCell>
-                    <TableCell />
+                    <TableCell >
+                      <Typography variant="h6" fontWeight="bold" >
+                        Markup
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                      Overhead
+                    </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                        Warranty
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                        ESA Fees
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                        Hydro Fees
+                      </Typography>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {materialRows.map((row, idx) => {
-                    const ext = row.units * (row.unitCost / unitDivisor[row.unit]);
-                    return (
-                      <TableRow key={idx}>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            value={row.name}
-                            onChange={(e) => updateMaterialRow(idx, { name: e.target.value })}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={row.units}
-                            onChange={(e) =>
-                              updateMaterialRow(idx, { units: Number(e.target.value) })
-                            }
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={row.unitCost}
-                            onChange={(e) =>
-                              updateMaterialRow(idx, { unitCost: Number(e.target.value) })
-                            }
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            size="small"
-                            value={row.unit}
-                            onChange={(e) =>
-                              updateMaterialRow(idx, { unit: e.target.value as any })
-                            }
-                          >
-                            <MenuItem value="Each">Each</MenuItem>
-                            <MenuItem value="C">C</MenuItem>
-                            <MenuItem value="M">M</MenuItem>
-                          </Select>
-                        </TableCell>
-                        <TableCell>{ext.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <IconButton onClick={() => removeMaterialRow(idx)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  <TableRow>
+                    <TableCell>
+                      <TextField
+                        label="Markup %"
+                        type="number"
+                        value={markup}
+                        onChange={(e) => setMarkup(Number(e.target.value))}
+                      />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="Overhead %"
+                      type="number"
+                      value={overhead}
+                      onChange={(e) => setOverhead(Number(e.target.value))}
+                    />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="Warranty %"
+                      type="number"
+                      value={warranty}
+                      onChange={(e) => setWarranty(Number(e.target.value))}
+                    />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="ESA Inspection Fees"
+                      type="number"
+                      value={esaFee}
+                      onChange={(e) => setEsaFee(Number(e.target.value))}
+                    />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="Hydro Fees"
+                      type="number"
+                      value={hydroFee}
+                      onChange={(e) => setHydroFee(Number(e.target.value))}
+                    />
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>
+                      <Typography fontWeight="bold">Markup Total: {markupAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold">Overhead Total: {overheadAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell >
+                      <Typography fontWeight="bold">Warranty Total: {warrantyAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell >
+                      <Typography fontWeight="bold">ESA Total: {esaFee.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell >
+                      <Typography fontWeight="bold">Hydro Total: {hydroFee.toFixed(2)}</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
               </Table>
-              <Box textAlign="right" my={1}>
-                <IconButton onClick={addMaterialRow} size="small">
-                  <AddIcon />
-                </IconButton>
-              </Box>
-              <Typography>Material Sum: {materialSum.toFixed(2)}</Typography>
-              <Typography>Total Material: {totalMaterial.toFixed(2)}</Typography>
-
-              <Typography variant="h6" fontWeight="bold" mt={4}>
-                Totals
-              </Typography>
-              <Typography>Cost: {baseCost.toFixed(2)}</Typography>
-              <TextField
-                label="Markup %"
-                type="number"
-                value={markup}
-                onChange={(e) => setMarkup(Number(e.target.value))}
-              />
-              <Typography>Markup Amount: {markupAmt.toFixed(2)}</Typography>
-              <TextField
-                label="Overhead %"
-                type="number"
-                value={overhead}
-                onChange={(e) => setOverhead(Number(e.target.value))}
-              />
-              <Typography>Overhead Amount: {overheadAmt.toFixed(2)}</Typography>
-              <Typography>Warranty (3%): {warranty.toFixed(2)}</Typography>
-              <TextField
-                label="ESA Inspection Fees"
-                type="number"
-                value={esaFee}
-                onChange={(e) => setEsaFee(Number(e.target.value))}
-              />
-              <TextField
-                label="Hydro Fees"
-                type="number"
-                value={hydroFee}
-                onChange={(e) => setHydroFee(Number(e.target.value))}
-              />
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-                <FormControl>
-                  <InputLabel id="disc">Discount</InputLabel>
-                  <Select
-                    labelId="disc"
-                    label="Discount"
-                    value={discountType}
-                    onChange={(e) => setDiscountType(e.target.value)}
-                  >
-                    <MenuItem value="None">None</MenuItem>
-                    <MenuItem value="Dollar">Dollar Discount</MenuItem>
-                    <MenuItem value="Percent">Percent Discount</MenuItem>
-                  </Select>
-                </FormControl>
-                {(discountType === "Dollar" || discountType === "Percent") && (
-                  <TextField
-                    label="Discount Value"
-                    type="number"
-                    value={discountValue}
-                    onChange={(e) => setDiscountValue(Number(e.target.value))}
-                  />
-                )}
-              </Stack>
-              <Typography>Total Discount: {discountAmt.toFixed(2)}</Typography>
-              <Typography variant="h6" fontWeight="bold">
+              <Table>
+               <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <Typography variant="h6" fontWeight="bold" >
+                        Discount
+                      </Typography>
+                  </TableCell>
+                </TableRow>
+               </TableHead>
+               <TableBody>
+                <TableRow>
+                    <TableCell>
+                      <FormControl>
+                        <InputLabel id="disc">Discount</InputLabel>
+                        <Select
+                          labelId="disc"
+                          label="Discount"
+                          value={discountType}
+                          onChange={(e) => setDiscountType(e.target.value)}
+                        >
+                          <MenuItem value="None">None</MenuItem>
+                          <MenuItem value="Dollar">Dollar Discount</MenuItem>
+                          <MenuItem value="Percent">Percent Discount</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell>
+                      {(discountType === "Dollar" || discountType === "Percent") && (
+                    <TextField
+                      label="Discount Value"
+                      type="number"
+                      value={discountValue}
+                      onChange={(e) => setDiscountValue(Number(e.target.value))}
+                    />
+                  )}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>
+                      <Typography fontWeight="bold">Total Discount: {discountAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+            </Table>
+              
+              <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
               <Button type="submit" variant="contained">
