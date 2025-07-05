@@ -314,12 +314,13 @@ const EstimateForm = () => {
               </Typography>
               <Table size="small">
                 <TableHead>
-                  <TableRow>
+                  {/*<TableRow>
                     <TableCell colSpan={9}>Material Name</TableCell>
-                  </TableRow>
+                  </TableRow> */}
                   <TableRow>
                     <TableCell>Material Quantity</TableCell>
-                    <TableCell>Material Unit Cost</TableCell>
+                    <TableCell colSpan={3}>Material Unit Cost</TableCell>
+
                     <TableCell>Material Unit Multiplier</TableCell>
                     <TableCell>Material Extension</TableCell>
                     <TableCell>Labour Unit</TableCell>
@@ -338,14 +339,18 @@ const EstimateForm = () => {
                     return (
                       <>
                         <TableRow key={`name-${idx}`}>
-                          <TableCell colSpan={9}>
+                          <TableCell colSpan={11}>
                             <TextField
                               size="small"
                               label="Material Name"
                               fullWidth
                               value={row.name}
-                              inputProps={{ maxLength: 255 }}
                               onChange={(e) => updateRow(idx, { name: e.target.value })}
+                              slotProps={{
+                                input: {
+                                  inputProps: { maxLength: 255 },
+                                },
+                              }}
                             />
                           </TableCell>
                         </TableRow>
@@ -358,7 +363,7 @@ const EstimateForm = () => {
                               onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell colSpan={3}>
                             <TextField
                               size="small"
                               type="number"
@@ -366,6 +371,7 @@ const EstimateForm = () => {
                               onChange={(e) => updateRow(idx, { unitCost: Number(e.target.value) })}
                             />
                           </TableCell>
+
                           <TableCell>
                             <Select
                               size="small"
@@ -383,7 +389,9 @@ const EstimateForm = () => {
                               size="small"
                               type="number"
                               value={row.labourUnit}
-                              onChange={(e) => updateRow(idx, { labourUnit: Number(e.target.value) })}
+                              onChange={(e) =>
+                                updateRow(idx, { labourUnit: Number(e.target.value) })
+                              }
                             />
                           </TableCell>
                           <TableCell>
@@ -415,42 +423,36 @@ const EstimateForm = () => {
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={4}>
+                    <TableCell colSpan={5}>
                       <Typography fontWeight="bold">Total Material Cost</Typography>
                     </TableCell>
                     <TableCell>
                       <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
                     </TableCell>
-                    <TableCell colSpan={4} />
+                    <TableCell colSpan={6} />
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={4}>
                       <Typography fontWeight="bold">Total Labour Extension</Typography>
                     </TableCell>
-                    <TableCell colSpan={3} />
+                    <TableCell colSpan={4} />
                     <TableCell>
                       <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
                     </TableCell>
-                    <TableCell colSpan={1} />
+                    <TableCell colSpan={3} />
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={4}>
                       <Typography fontWeight="bold">Total Labour Cost</Typography>
                     </TableCell>
-                    <TableCell colSpan={3} />
+                    <TableCell colSpan={5} />
                     <TableCell>
                       <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
                     </TableCell>
-                    <TableCell colSpan={1} />
+                    <TableCell colSpan={2} />
                   </TableRow>
                   <TableRow>
-                    <TableCell />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={2}>
+                    <TableCell colSpan={10}>
                       <Typography variant="h6" fontWeight="bold">
                         Total Cost
                       </Typography>
@@ -461,7 +463,7 @@ const EstimateForm = () => {
                         {baseCost.toFixed(2)}
                       </Typography>
                     </TableCell>
-                    <TableCell colSpan={6} />
+                    <TableCell />
                   </TableRow>
                 </TableFooter>
               </Table>
