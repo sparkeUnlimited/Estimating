@@ -17,6 +17,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  TableContainer,
   IconButton,
   Select,
   MenuItem,
@@ -326,7 +327,8 @@ const EstimateForm = () => {
           {customerValid && (
             <>
               
-              
+
+              <TableContainer sx={{ overflowX: "auto" }}>
               <Table size="small">
                 <TableBody>
                   {rows.map((row, idx) => {
@@ -483,11 +485,13 @@ const EstimateForm = () => {
                   </TableRow>
                 </TableFooter>
               </Table>
+              </TableContainer>
               <Box textAlign="right" my={1}>
                 <IconButton onClick={addRow} size="small">
                   <AddIcon />
                 </IconButton>
               </Box>
+              <TableContainer sx={{ overflowX: "auto" }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -582,6 +586,8 @@ const EstimateForm = () => {
                   </TableRow>
                 </TableFooter>
               </Table>
+              </TableContainer>
+              <TableContainer sx={{ overflowX: "auto" }}>
               <Table>
                <TableHead>
                 <TableRow>
@@ -629,7 +635,8 @@ const EstimateForm = () => {
                   </TableRow>
                 </TableFooter>
             </Table>
-              
+            </TableContainer>
+
               <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
