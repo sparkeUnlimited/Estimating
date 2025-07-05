@@ -315,7 +315,9 @@ const EstimateForm = () => {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Material Name</TableCell>
+                    <TableCell colSpan={9}>Material Name</TableCell>
+                  </TableRow>
+                  <TableRow>
                     <TableCell>Material Quantity</TableCell>
                     <TableCell>Material Unit Cost</TableCell>
                     <TableCell>Material Unit Multiplier</TableCell>
@@ -334,73 +336,80 @@ const EstimateForm = () => {
                       row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
                     const lc = labourExt * labourRate;
                     return (
-                      <TableRow key={idx}>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            value={row.name}
-                            onChange={(e) => updateRow(idx, { name: e.target.value })}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={row.quantity}
-                            onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={row.unitCost}
-                            onChange={(e) => updateRow(idx, { unitCost: Number(e.target.value) })}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            size="small"
-                            value={row.unit}
-                            onChange={(e) => updateRow(idx, { unit: e.target.value as any })}
-                          >
-                            <MenuItem value="Each">Each</MenuItem>
-                            <MenuItem value="C">C</MenuItem>
-                            <MenuItem value="M">M</MenuItem>
-                          </Select>
-                        </TableCell>
-                        <TableCell>{materialExt.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <TextField
-                            size="small"
-                            type="number"
-                            value={row.labourUnit}
-                            onChange={(e) => updateRow(idx, { labourUnit: Number(e.target.value) })}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            size="small"
-                            value={row.labourUnitMultiplier}
-                            onChange={(e) =>
-                              updateRow(idx, {
-                                labourUnitMultiplier: e.target.value as any,
-                              })
-                            }
-                          >
-                            <MenuItem value="Each">Each</MenuItem>
-                            <MenuItem value="C">C</MenuItem>
-                            <MenuItem value="M">M</MenuItem>
-                          </Select>
-                        </TableCell>
-                        <TableCell>{labourExt.toFixed(2)}</TableCell>
-                        <TableCell>{lc.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <IconButton onClick={() => removeRow(idx)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
+                      <>
+                        <TableRow key={`name-${idx}`}>
+                          <TableCell colSpan={9}>
+                            <TextField
+                              size="small"
+                              label="Material Name"
+                              fullWidth
+                              value={row.name}
+                              inputProps={{ maxLength: 255 }}
+                              onChange={(e) => updateRow(idx, { name: e.target.value })}
+                            />
+                          </TableCell>
+                        </TableRow>
+                        <TableRow key={idx}>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.quantity}
+                              onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.unitCost}
+                              onChange={(e) => updateRow(idx, { unitCost: Number(e.target.value) })}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              size="small"
+                              value={row.unit}
+                              onChange={(e) => updateRow(idx, { unit: e.target.value as any })}
+                            >
+                              <MenuItem value="Each">Each</MenuItem>
+                              <MenuItem value="C">C</MenuItem>
+                              <MenuItem value="M">M</MenuItem>
+                            </Select>
+                          </TableCell>
+                          <TableCell>{materialExt.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={row.labourUnit}
+                              onChange={(e) => updateRow(idx, { labourUnit: Number(e.target.value) })}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              size="small"
+                              value={row.labourUnitMultiplier}
+                              onChange={(e) =>
+                                updateRow(idx, {
+                                  labourUnitMultiplier: e.target.value as any,
+                                })
+                              }
+                            >
+                              <MenuItem value="Each">Each</MenuItem>
+                              <MenuItem value="C">C</MenuItem>
+                              <MenuItem value="M">M</MenuItem>
+                            </Select>
+                          </TableCell>
+                          <TableCell>{labourExt.toFixed(2)}</TableCell>
+                          <TableCell>{lc.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <IconButton onClick={() => removeRow(idx)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      </>
                     );
                   })}
                 </TableBody>
@@ -412,13 +421,13 @@ const EstimateForm = () => {
                     <TableCell>
                       <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
                     </TableCell>
-                    <TableCell colSpan={5} />
+                    <TableCell colSpan={4} />
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={4}>
                       <Typography fontWeight="bold">Total Labour Extension</Typography>
                     </TableCell>
-                    <TableCell colSpan={4} />
+                    <TableCell colSpan={3} />
                     <TableCell>
                       <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
                     </TableCell>
@@ -428,7 +437,7 @@ const EstimateForm = () => {
                     <TableCell colSpan={4}>
                       <Typography fontWeight="bold">Total Labour Cost</Typography>
                     </TableCell>
-                    <TableCell colSpan={4} />
+                    <TableCell colSpan={3} />
                     <TableCell>
                       <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
                     </TableCell>
@@ -452,7 +461,7 @@ const EstimateForm = () => {
                         {baseCost.toFixed(2)}
                       </Typography>
                     </TableCell>
-                    <TableCell colSpan={7} />
+                    <TableCell colSpan={6} />
                   </TableRow>
                 </TableFooter>
               </Table>
