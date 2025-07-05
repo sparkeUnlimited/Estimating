@@ -80,19 +80,26 @@ const EstimateForm = () => {
       labourUnitMultiplier: "Each",
     },
   ]);
-  const [workType, setWorkType] = useState("Residential");
+  const [workType, setWorkType] = useState("Select Type");
   const [labourRate, setLabourRate] = useState(125);
 
   const [markup, setMarkup] = useState(30);
   const [overhead, setOverhead] = useState(10);
+  const [warranty, setWarranty] = useState(3);
   const [esaFee, setEsaFee] = useState(0);
   const [hydroFee, setHydroFee] = useState(0);
   const [discountType, setDiscountType] = useState("None");
   const [discountValue, setDiscountValue] = useState(0);
 
   useEffect(() => {
-    setLabourRate(workType === "Residential" ? 125 : 145);
-  }, [workType]);
+  if (workType === "Residential") {
+    setLabourRate(125);
+  } else if (workType === "Commercial") {
+    setLabourRate(145);
+  } else {
+    setLabourRate(0); // Default or unrecognized type
+  }
+}, [workType]);
 
   const customerValid =
     fullName && address && city && province && postalCode && contactMethod && phone && email;
@@ -135,8 +142,8 @@ const EstimateForm = () => {
   const markupAmt = baseCost * (markup / 100);
   const overheadAmt = baseCost * (overhead / 100);
   const cost = baseCost + markupAmt + overheadAmt;
-  const warranty = cost * 0.03;
-  const subtotal = cost + warranty + esaFee + hydroFee;
+  const warrantyAmt = cost * 0.03;
+  const subtotal = cost + warrantyAmt + esaFee + hydroFee;
 
   const discountAmt =
     discountType === "Dollar"
@@ -178,7 +185,7 @@ const EstimateForm = () => {
         markupAmt,
         overheadAmt,
         cost,
-        warranty,
+        warrantyAmt,
         discountAmt,
         grandTotal,
       },
@@ -287,6 +294,9 @@ const EstimateForm = () => {
 
           {customerValid && (
             <>
+              <Typography variant="h6" fontWeight="bold" mt={2}>
+                Estimate Items
+              </Typography>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
                 <FormControl size="small">
                   <InputLabel id="wt">Work Type</InputLabel>
@@ -296,6 +306,7 @@ const EstimateForm = () => {
                     value={workType}
                     onChange={(e) => setWorkType(e.target.value)}
                   >
+                    <MenuItem value="Select Type">Select Type</MenuItem>
                     <MenuItem value="Residential">Residential</MenuItem>
                     <MenuItem value="Commercial">Commercial</MenuItem>
                   </Select>
@@ -309,18 +320,12 @@ const EstimateForm = () => {
                 />
               </Stack>
 
-              <Typography variant="h6" fontWeight="bold" mt={2}>
-                Estimate Items
-              </Typography>
+              
               <Table size="small">
                 <TableHead>
-                  {/*<TableRow>
-                    <TableCell colSpan={9}>Material Name</TableCell>
-                  </TableRow> */}
                   <TableRow>
                     <TableCell>Material Quantity</TableCell>
-                    <TableCell colSpan={3}>Material Unit Cost</TableCell>
-
+                    <TableCell >Material Unit Cost</TableCell>
                     <TableCell>Material Unit Multiplier</TableCell>
                     <TableCell>Material Extension</TableCell>
                     <TableCell>Labour Unit</TableCell>
@@ -339,7 +344,7 @@ const EstimateForm = () => {
                     return (
                       <>
                         <TableRow key={`name-${idx}`}>
-                          <TableCell colSpan={11}>
+                          <TableCell colSpan={9}>
                             <TextField
                               size="small"
                               label="Material Name"
@@ -363,7 +368,7 @@ const EstimateForm = () => {
                               onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
                             />
                           </TableCell>
-                          <TableCell colSpan={3}>
+                          <TableCell >
                             <TextField
                               size="small"
                               type="number"
@@ -423,36 +428,34 @@ const EstimateForm = () => {
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell colSpan={5}>
+                    <TableCell colSpan={3}>
                       <Typography fontWeight="bold">Total Material Cost</Typography>
                     </TableCell>
                     <TableCell>
                       <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
                     </TableCell>
-                    <TableCell colSpan={6} />
+                    <TableCell colSpan={5} />
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={4}>
+                    <TableCell colSpan={6}>
                       <Typography fontWeight="bold">Total Labour Extension</Typography>
                     </TableCell>
-                    <TableCell colSpan={4} />
                     <TableCell>
                       <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell colSpan={3} />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={4}>
-                      <Typography fontWeight="bold">Total Labour Cost</Typography>
-                    </TableCell>
-                    <TableCell colSpan={5} />
-                    <TableCell>
-                      <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
                     </TableCell>
                     <TableCell colSpan={2} />
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={10}>
+                    <TableCell colSpan={7}>
+                      <Typography fontWeight="bold">Total Labour Cost</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell  />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={8}>
                       <Typography variant="h6" fontWeight="bold">
                         Total Cost
                       </Typography>
@@ -472,62 +475,148 @@ const EstimateForm = () => {
                   <AddIcon />
                 </IconButton>
               </Box>
-
-              <Typography variant="h6" fontWeight="bold" mt={4}>
-                Totals
-              </Typography>
-              <Typography>Cost: {baseCost.toFixed(2)}</Typography>
-              <TextField
-                label="Markup %"
-                type="number"
-                value={markup}
-                onChange={(e) => setMarkup(Number(e.target.value))}
-              />
-              <Typography>Markup Amount: {markupAmt.toFixed(2)}</Typography>
-              <TextField
-                label="Overhead %"
-                type="number"
-                value={overhead}
-                onChange={(e) => setOverhead(Number(e.target.value))}
-              />
-              <Typography>Overhead Amount: {overheadAmt.toFixed(2)}</Typography>
-              <Typography>Warranty (3%): {warranty.toFixed(2)}</Typography>
-              <TextField
-                label="ESA Inspection Fees"
-                type="number"
-                value={esaFee}
-                onChange={(e) => setEsaFee(Number(e.target.value))}
-              />
-              <TextField
-                label="Hydro Fees"
-                type="number"
-                value={hydroFee}
-                onChange={(e) => setHydroFee(Number(e.target.value))}
-              />
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-                <FormControl>
-                  <InputLabel id="disc">Discount</InputLabel>
-                  <Select
-                    labelId="disc"
-                    label="Discount"
-                    value={discountType}
-                    onChange={(e) => setDiscountType(e.target.value)}
-                  >
-                    <MenuItem value="None">None</MenuItem>
-                    <MenuItem value="Dollar">Dollar Discount</MenuItem>
-                    <MenuItem value="Percent">Percent Discount</MenuItem>
-                  </Select>
-                </FormControl>
-                {(discountType === "Dollar" || discountType === "Percent") && (
-                  <TextField
-                    label="Discount Value"
-                    type="number"
-                    value={discountValue}
-                    onChange={(e) => setDiscountValue(Number(e.target.value))}
-                  />
-                )}
-              </Stack>
-              <Typography>Total Discount: {discountAmt.toFixed(2)}</Typography>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell >
+                      <Typography variant="h6" fontWeight="bold" >
+                        Markup
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                      Overhead
+                    </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                        Warranty
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                        ESA Fees
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                     <Typography variant="h6" fontWeight="bold" >
+                        Hydro Fees
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <TextField
+                        label="Markup %"
+                        type="number"
+                        value={markup}
+                        onChange={(e) => setMarkup(Number(e.target.value))}
+                      />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="Overhead %"
+                      type="number"
+                      value={overhead}
+                      onChange={(e) => setOverhead(Number(e.target.value))}
+                    />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="Warranty %"
+                      type="number"
+                      value={warranty}
+                      onChange={(e) => setWarranty(Number(e.target.value))}
+                    />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="ESA Inspection Fees"
+                      type="number"
+                      value={esaFee}
+                      onChange={(e) => setEsaFee(Number(e.target.value))}
+                    />
+                    </TableCell>
+                    <TableCell>
+                    <TextField
+                      label="Hydro Fees"
+                      type="number"
+                      value={hydroFee}
+                      onChange={(e) => setHydroFee(Number(e.target.value))}
+                    />
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>
+                      <Typography fontWeight="bold">Markup Total: {markupAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold">Overhead Total: {overheadAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell >
+                      <Typography fontWeight="bold">Warranty Total: {warrantyAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell >
+                      <Typography fontWeight="bold">ESA Total: {esaFee.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell >
+                      <Typography fontWeight="bold">Hydro Total: {hydroFee.toFixed(2)}</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+              <Table>
+               <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <Typography variant="h6" fontWeight="bold" >
+                        Discount
+                      </Typography>
+                  </TableCell>
+                </TableRow>
+               </TableHead>
+               <TableBody>
+                <TableRow>
+                    <TableCell>
+                      <FormControl>
+                        <InputLabel id="disc">Discount</InputLabel>
+                        <Select
+                          labelId="disc"
+                          label="Discount"
+                          value={discountType}
+                          onChange={(e) => setDiscountType(e.target.value)}
+                        >
+                          <MenuItem value="None">None</MenuItem>
+                          <MenuItem value="Dollar">Dollar Discount</MenuItem>
+                          <MenuItem value="Percent">Percent Discount</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell>
+                      {(discountType === "Dollar" || discountType === "Percent") && (
+                    <TextField
+                      label="Discount Value"
+                      type="number"
+                      value={discountValue}
+                      onChange={(e) => setDiscountValue(Number(e.target.value))}
+                    />
+                  )}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>
+                      <Typography fontWeight="bold">Total Discount: {discountAmt.toFixed(2)}</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+            </Table>
+              
               <Typography variant="h6" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
