@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -72,7 +72,6 @@ const EstimateForm = () => {
   const [contactMethod, setContactMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
- 
 
   const [rows, setRows] = useState<EstimateRow[]>([
     {
@@ -96,19 +95,19 @@ const EstimateForm = () => {
   const [discountValue, setDiscountValue] = useState(0);
 
   useEffect(() => {
-  if (workType === "Residential") {
-    setLabourRate(125);
-  } else if (workType === "Commercial") {
-    setLabourRate(145);
-  } else {
-    setLabourRate(0); // Default or unrecognized type
-  }
-}, [workType]);
+    if (workType === "Residential") {
+      setLabourRate(125);
+    } else if (workType === "Commercial") {
+      setLabourRate(145);
+    } else {
+      setLabourRate(0); // Default or unrecognized type
+    }
+  }, [workType]);
 
   const allFieldsFilled =
     fullName && address && city && province && postalCode && contactMethod && phone && email;
 
-  const customerValid = allFieldsFilled && workType !== "Select Type"; 
+  const customerValid = allFieldsFilled && workType !== "Select Type";
 
   const addRow = () => {
     setRows((r) => [
@@ -148,7 +147,7 @@ const EstimateForm = () => {
   const markupAmt = totalMaterial * (markup / 100);
   const overheadAmt = baseCost * (overhead / 100);
   const cost = baseCost + markupAmt + overheadAmt;
-  const warrantyAmt = cost * 0.03;
+  const warrantyAmt = cost * (warranty / 100);
   const subtotal = cost + warrantyAmt + esaFee + hydroFee;
 
   const discountAmt =
@@ -297,194 +296,195 @@ const EstimateForm = () => {
               />
             </Stack>
             <Typography variant="h6" fontWeight="bold" mt={2}>
-                Estimate Items
-              </Typography>
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-                <FormControl size="small">
-                  <InputLabel id="wt">Work Type</InputLabel>
-                  <Select
-                    labelId="wt"
-                    label="Work Type"
-                    value={workType}
-                    onChange={(e) => setWorkType(e.target.value)}
-                  >
-                    <MenuItem value="Select Type">Select Type</MenuItem>
-                    <MenuItem value="Residential">Residential</MenuItem>
-                    <MenuItem value="Commercial">Commercial</MenuItem>
-                  </Select>
-                </FormControl>
-                <TextField
-                  label="Labour Rate"
-                  size="small"
-                  type="number"
-                  value={labourRate}
-                  onChange={(e) => setLabourRate(Number(e.target.value))}
-                />
-              </Stack>
-
+              Estimate Items
+            </Typography>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+              <FormControl size="small">
+                <InputLabel id="wt">Work Type</InputLabel>
+                <Select
+                  labelId="wt"
+                  label="Work Type"
+                  value={workType}
+                  onChange={(e) => setWorkType(e.target.value)}
+                >
+                  <MenuItem value="Select Type">Select Type</MenuItem>
+                  <MenuItem value="Residential">Residential</MenuItem>
+                  <MenuItem value="Commercial">Commercial</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label="Labour Rate"
+                size="small"
+                type="number"
+                value={labourRate}
+                onChange={(e) => setLabourRate(Number(e.target.value))}
+              />
+            </Stack>
           </Box>
 
           {customerValid && (
             <>
-              
-
               <TableContainer sx={{ overflowX: "auto" }}>
-              <Table size="small">
-                <TableBody>
-                  {rows.map((row, idx) => {
-                    const materialExt = row.quantity * (row.unitCost / unitDivisor[row.unit]);
-                    const labourExt =
-                      row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
-                    const lc = labourExt * labourRate;
-                    return (
-                       <React.Fragment key={`row-${idx}`}>
-                        <TableRow >
-                          <TableCell colSpan={9} sx={{ p: 0 }}>
-                            <TextField
-                              size="small"
-                              label="Material Name"
-                              fullWidth
-                              value={row.name}
-                              onChange={(e) => updateRow(idx, { name: e.target.value })}
-                              slotProps={{
-                                input: {
-                                  inputProps: { maxLength: 255 },
-                                },
-                              }}
-                            />
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Material Quantity</TableCell>
-                          <TableCell >Material Unit Cost</TableCell>
-                          <TableCell>Material Unit Multiplier</TableCell>
-                          <TableCell>Material Extension</TableCell>
-                          <TableCell>Labour Unit</TableCell>
-                          <TableCell>Labour Unit Multiplier</TableCell>
-                          <TableCell>Labour Extension</TableCell>
-                          <TableCell>Labour Cost</TableCell>
-                          <TableCell />
-                        </TableRow>
-                        <TableRow >
-                          <TableCell sx={{ pl: 0 }}>
-                            <TextField
-                              size="small"
-                              type="number"
-                              value={row.quantity}
-                              onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
-                            />
-                          </TableCell>
-                          <TableCell >
-                            <TextField
-                              size="small"
-                              type="number"
-                              value={row.unitCost}
-                              onChange={(e) => updateRow(idx, { unitCost: Number(e.target.value) })}
-                            />
-                          </TableCell>
+                <Table size="small">
+                  <TableBody>
+                    {rows.map((row, idx) => {
+                      const materialExt = row.quantity * (row.unitCost / unitDivisor[row.unit]);
+                      const labourExt =
+                        row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
+                      const lc = labourExt * labourRate;
+                      return (
+                        <React.Fragment key={`row-${idx}`}>
+                          <TableRow>
+                            <TableCell colSpan={9} sx={{ p: 0 }}>
+                              <TextField
+                                size="small"
+                                label="Material Name"
+                                fullWidth
+                                value={row.name}
+                                onChange={(e) => updateRow(idx, { name: e.target.value })}
+                                slotProps={{
+                                  input: {
+                                    inputProps: { maxLength: 255 },
+                                  },
+                                }}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Material Quantity</TableCell>
+                            <TableCell>Material Unit Cost</TableCell>
+                            <TableCell>Material Unit Multiplier</TableCell>
+                            <TableCell>Material Extension</TableCell>
+                            <TableCell>Labour Unit</TableCell>
+                            <TableCell>Labour Unit Multiplier</TableCell>
+                            <TableCell>Labour Extension</TableCell>
+                            <TableCell>Labour Cost</TableCell>
+                            <TableCell />
+                          </TableRow>
+                          <TableRow>
+                            <TableCell sx={{ pl: 0 }}>
+                              <TextField
+                                size="small"
+                                type="number"
+                                value={row.quantity}
+                                onChange={(e) =>
+                                  updateRow(idx, { quantity: Number(e.target.value) })
+                                }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                type="number"
+                                value={row.unitCost}
+                                onChange={(e) =>
+                                  updateRow(idx, { unitCost: Number(e.target.value) })
+                                }
+                              />
+                            </TableCell>
 
-                          <TableCell>
-                            <Select
-                              size="small"
-                              value={row.unit}
-                              onChange={(e) => updateRow(idx, { unit: e.target.value as any })}
-                            >
-                              <MenuItem value="Each">Each</MenuItem>
-                              <MenuItem value="C">C</MenuItem>
-                              <MenuItem value="M">M</MenuItem>
-                            </Select>
-                          </TableCell>
-                          <TableCell>{materialExt.toFixed(2)}</TableCell>
-                          <TableCell>
-                            <TextField
-                              size="small"
-                              type="number"
-                              value={row.labourUnit}
-                              onChange={(e) =>
-                                updateRow(idx, { labourUnit: Number(e.target.value) })
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              size="small"
-                              value={row.labourUnitMultiplier}
-                              onChange={(e) =>
-                                updateRow(idx, {
-                                  labourUnitMultiplier: e.target.value as any,
-                                })
-                              }
-                            >
-                              <MenuItem value="Each">Each</MenuItem>
-                              <MenuItem value="C">C</MenuItem>
-                              <MenuItem value="M">M</MenuItem>
-                            </Select>
-                          </TableCell>
-                          <TableCell>{labourExt.toFixed(2)}</TableCell>
-                          <TableCell>{lc.toFixed(2)}</TableCell>
-                          <TableCell>
-                            <IconButton onClick={() => removeRow(idx)}>
-                              <DeleteIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell colSpan={9} sx={{ px: 0 }}>
-                            <Divider
-                              sx={{
-                                borderBottom: "2px solid blue",
-                                height: "1px",
-                              }}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell colSpan={3}>
-                      <Typography fontWeight="bold">Total Material Cost</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell colSpan={5} />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={6}>
-                      <Typography fontWeight="bold">Total Labour Extension</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell colSpan={2} />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={7}>
-                      <Typography fontWeight="bold">Total Labour Cost</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell  />
-                  </TableRow>
-                  <TableRow>
-                    <TableCell colSpan={8}>
-                      <Typography variant="h6" fontWeight="bold">
-                        Total Cost
-                      </Typography>
-                    </TableCell>
+                            <TableCell>
+                              <Select
+                                size="small"
+                                value={row.unit}
+                                onChange={(e) => updateRow(idx, { unit: e.target.value as any })}
+                              >
+                                <MenuItem value="Each">Each</MenuItem>
+                                <MenuItem value="C">C</MenuItem>
+                                <MenuItem value="M">M</MenuItem>
+                              </Select>
+                            </TableCell>
+                            <TableCell>{materialExt.toFixed(2)}</TableCell>
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                type="number"
+                                value={row.labourUnit}
+                                onChange={(e) =>
+                                  updateRow(idx, { labourUnit: Number(e.target.value) })
+                                }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Select
+                                size="small"
+                                value={row.labourUnitMultiplier}
+                                onChange={(e) =>
+                                  updateRow(idx, {
+                                    labourUnitMultiplier: e.target.value as any,
+                                  })
+                                }
+                              >
+                                <MenuItem value="Each">Each</MenuItem>
+                                <MenuItem value="C">C</MenuItem>
+                                <MenuItem value="M">M</MenuItem>
+                              </Select>
+                            </TableCell>
+                            <TableCell>{labourExt.toFixed(2)}</TableCell>
+                            <TableCell>{lc.toFixed(2)}</TableCell>
+                            <TableCell>
+                              <IconButton onClick={() => removeRow(idx)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell colSpan={9} sx={{ px: 0 }}>
+                              <Divider
+                                sx={{
+                                  borderBottom: "2px solid blue",
+                                  height: "1px",
+                                }}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        </React.Fragment>
+                      );
+                    })}
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <Typography fontWeight="bold">Total Material Cost</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
+                      </TableCell>
+                      <TableCell colSpan={5} />
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={6}>
+                        <Typography fontWeight="bold">Total Labour Extension</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
+                      </TableCell>
+                      <TableCell colSpan={2} />
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={7}>
+                        <Typography fontWeight="bold">Total Labour Cost</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
+                      </TableCell>
+                      <TableCell />
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={8}>
+                        <Typography variant="h6" fontWeight="bold">
+                          Total Cost
+                        </Typography>
+                      </TableCell>
 
-                    <TableCell>
-                      <Typography variant="h6" fontWeight="bold">
-                        {baseCost.toFixed(2)}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
+                      <TableCell>
+                        <Typography variant="h6" fontWeight="bold">
+                          {baseCost.toFixed(2)}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
               </TableContainer>
               <Box textAlign="right" my={1}>
                 <IconButton onClick={addRow} size="small">
@@ -492,150 +492,160 @@ const EstimateForm = () => {
                 </IconButton>
               </Box>
               <TableContainer sx={{ overflowX: "auto" }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell >
-                      <Typography variant="h6" fontWeight="bold" >
-                        Markup
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                     <Typography variant="h6" fontWeight="bold" >
-                      Overhead
-                    </Typography>
-                    </TableCell>
-                    <TableCell>
-                     <Typography variant="h6" fontWeight="bold" >
-                        Warranty
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                     <Typography variant="h6" fontWeight="bold" >
-                        ESA Fees
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                     <Typography variant="h6" fontWeight="bold" >
-                        Hydro Fees
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <TextField
-                        label="Markup %"
-                        type="number"
-                        value={markup}
-                        onChange={(e) => setMarkup(Number(e.target.value))}
-                      />
-                    </TableCell>
-                    <TableCell>
-                    <TextField
-                      label="Overhead %"
-                      type="number"
-                      value={overhead}
-                      onChange={(e) => setOverhead(Number(e.target.value))}
-                    />
-                    </TableCell>
-                    <TableCell>
-                    <TextField
-                      label="Warranty %"
-                      type="number"
-                      value={warranty}
-                      onChange={(e) => setWarranty(Number(e.target.value))}
-                    />
-                    </TableCell>
-                    <TableCell>
-                    <TextField
-                      label="ESA Inspection Fees"
-                      type="number"
-                      value={esaFee}
-                      onChange={(e) => setEsaFee(Number(e.target.value))}
-                    />
-                    </TableCell>
-                    <TableCell>
-                    <TextField
-                      label="Hydro Fees"
-                      type="number"
-                      value={hydroFee}
-                      onChange={(e) => setHydroFee(Number(e.target.value))}
-                    />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell>
-                      <Typography fontWeight="bold">Markup Total: {markupAmt.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight="bold">Overhead Total: {overheadAmt.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell >
-                      <Typography fontWeight="bold">Warranty Total: {warrantyAmt.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell >
-                      <Typography fontWeight="bold">ESA Total: {esaFee.toFixed(2)}</Typography>
-                    </TableCell>
-                    <TableCell >
-                      <Typography fontWeight="bold">Hydro Total: {hydroFee.toFixed(2)}</Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6" fontWeight="bold">
+                          Markup
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" fontWeight="bold">
+                          Overhead
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" fontWeight="bold">
+                          Warranty
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" fontWeight="bold">
+                          ESA Fees
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6" fontWeight="bold">
+                          Hydro Fees
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>
+                        <TextField
+                          label="Markup %"
+                          type="number"
+                          value={markup}
+                          onChange={(e) => setMarkup(Number(e.target.value))}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          label="Overhead %"
+                          type="number"
+                          value={overhead}
+                          onChange={(e) => setOverhead(Number(e.target.value))}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          label="Warranty %"
+                          type="number"
+                          value={warranty}
+                          onChange={(e) => setWarranty(Number(e.target.value))}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          label="ESA Inspection Fees"
+                          type="number"
+                          value={esaFee}
+                          onChange={(e) => setEsaFee(Number(e.target.value))}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          label="Hydro Fees"
+                          type="number"
+                          value={hydroFee}
+                          onChange={(e) => setHydroFee(Number(e.target.value))}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell>
+                        <Typography fontWeight="bold">
+                          Markup Total: {markupAmt.toFixed(2)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography fontWeight="bold">
+                          Overhead Total: {overheadAmt.toFixed(2)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography fontWeight="bold">
+                          Warranty Total: {warrantyAmt.toFixed(2)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography fontWeight="bold">ESA Total: {esaFee.toFixed(2)}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography fontWeight="bold">
+                          Hydro Total: {hydroFee.toFixed(2)}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
               </TableContainer>
               <TableContainer sx={{ overflowX: "auto" }}>
-              <Table>
-               <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography variant="h6" fontWeight="bold" >
-                        Discount
-                      </Typography>
-                  </TableCell>
-                </TableRow>
-               </TableHead>
-               <TableBody>
-                <TableRow>
-                    <TableCell>
-                      <FormControl>
-                        <InputLabel id="disc">Discount</InputLabel>
-                        <Select
-                          labelId="disc"
-                          label="Discount"
-                          value={discountType}
-                          onChange={(e) => setDiscountType(e.target.value)}
-                        >
-                          <MenuItem value="None">None</MenuItem>
-                          <MenuItem value="Dollar">Dollar Discount</MenuItem>
-                          <MenuItem value="Percent">Percent Discount</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </TableCell>
-                    <TableCell>
-                      {(discountType === "Dollar" || discountType === "Percent") && (
-                    <TextField
-                      label="Discount Value"
-                      type="number"
-                      value={discountValue}
-                      onChange={(e) => setDiscountValue(Number(e.target.value))}
-                    />
-                  )}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell>
-                      <Typography fontWeight="bold">Total Discount: {discountAmt.toFixed(2)}</Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
-            </Table>
-            </TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6" fontWeight="bold">
+                          Discount
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>
+                        <FormControl>
+                          <InputLabel id="disc">Discount</InputLabel>
+                          <Select
+                            labelId="disc"
+                            label="Discount"
+                            value={discountType}
+                            onChange={(e) => setDiscountType(e.target.value)}
+                          >
+                            <MenuItem value="None">None</MenuItem>
+                            <MenuItem value="Dollar">Dollar Discount</MenuItem>
+                            <MenuItem value="Percent">Percent Discount</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </TableCell>
+                      <TableCell>
+                        {(discountType === "Dollar" || discountType === "Percent") && (
+                          <TextField
+                            label="Discount Value"
+                            type="number"
+                            value={discountValue}
+                            onChange={(e) => setDiscountValue(Number(e.target.value))}
+                          />
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell>
+                        <Typography fontWeight="bold">
+                          Total Discount: {discountAmt.toFixed(2)}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </TableContainer>
 
               <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
