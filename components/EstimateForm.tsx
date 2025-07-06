@@ -453,35 +453,38 @@ const EstimateForm = () => {
                       <TableCell colSpan={5} />
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={3}>
                         <Typography fontWeight="bold">Total Labour Extension</Typography>
                       </TableCell>
+                      <TableCell colSpan={3} />
                       <TableCell>
                         <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
                       </TableCell>
                       <TableCell colSpan={2} />
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={7}>
+                      <TableCell colSpan={3}>
                         <Typography fontWeight="bold">Total Labour Cost</Typography>
                       </TableCell>
+                      <TableCell colSpan={4} />
                       <TableCell>
                         <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
                       </TableCell>
                       <TableCell />
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={8}>
+                      <TableCell colSpan={3}>
                         <Typography variant="h6" fontWeight="bold">
                           Total Cost
                         </Typography>
                       </TableCell>
-
+                      
                       <TableCell>
                         <Typography variant="h6" fontWeight="bold">
                           {baseCost.toFixed(2)}
                         </Typography>
                       </TableCell>
+                      <TableCell colSpan={5} />
                     </TableRow>
                   </TableFooter>
                 </Table>
@@ -499,10 +502,16 @@ const EstimateForm = () => {
                         <Typography variant="h6" fontWeight="bold">
                           Markup
                         </Typography>
+                        <Typography >
+                          On Material Only
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="h6" fontWeight="bold">
                           Overhead
+                        </Typography>
+                        <Typography >
+                         Material + Labour
                         </Typography>
                       </TableCell>
                       <TableCell>
