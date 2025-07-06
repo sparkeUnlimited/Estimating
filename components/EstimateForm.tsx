@@ -214,7 +214,8 @@ const EstimateForm = () => {
         phone,
         email,
       },
-      estimate:{
+      estimate: {
+
         workType,
         labourRate,
         rows,
@@ -237,7 +238,8 @@ const EstimateForm = () => {
           discountAmt,
           grandTotal,
         },
-      }
+      },
+
     };
 
     const pdfBlob = new Blob([], { type: "application/pdf" });
