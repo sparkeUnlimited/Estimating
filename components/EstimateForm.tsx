@@ -267,23 +267,16 @@ const EstimateForm = () => {
           </Grid>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Stack direction="row" spacing={1}>
+        
                 <AddressAutocomplete
+                  
                   value={address}
                   onChange={(val) => setAddress(val)}
                   onSelect={(val) =>
                     lookupAddress(val, setCity, setProvince, setPostalCode)
                   }
                 />
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    lookupAddress(address, setCity, setProvince, setPostalCode)
-                  }
-                >
-                  Lookup
-                </Button>
-              </Stack>
+       
             </Grid>
           </Grid>
           <Grid container spacing={2}>
