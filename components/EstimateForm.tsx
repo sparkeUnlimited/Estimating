@@ -244,7 +244,7 @@ const EstimateForm = () => {
     };
 
     const pdfBlob = new Blob([], { type: "application/pdf" });
-    await sendEstimateDetailsLambda(data.customer, pdfBlob);
+    await sendEstimateDetailsLambda(data, pdfBlob);
   };
 
   return (
