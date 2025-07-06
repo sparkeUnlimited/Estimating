@@ -1,5 +1,5 @@
 export const sendEstimateEmail = async (data: any, _pdf: Blob) => {
-  const resp = await fetch("https://api.sparkeunlimited.ca/", {
+  const resp = await fetch("https://api.sparkeunlimited.ca/estimate", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
