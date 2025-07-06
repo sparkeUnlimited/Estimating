@@ -295,11 +295,11 @@ const EstimateForm = () => {
                 fullWidth
               />
             </Stack>
-            <Typography variant="h6" fontWeight="bold" mt={2}>
+            <Typography variant="h6" fontWeight="bold" my={4}>
               Estimate Items
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-              <FormControl size="small">
+              <FormControl fullWidth sx={{ mb: { xs: 2, sm: 3 } }}>
                 <InputLabel id="wt">Work Type</InputLabel>
                 <Select
                   labelId="wt"
