@@ -28,6 +28,7 @@ import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { sendEstimateDetailsLambda } from "@/lib/api";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 const capitalizeWords = (value: string) =>
   value
@@ -267,12 +268,12 @@ const EstimateForm = () => {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <Stack direction="row" spacing={1}>
-                <TextField
-                  label="Address"
+                <AddressAutocomplete
                   value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                  fullWidth
+                  onChange={(val) => setAddress(val)}
+                  onSelect={(val) =>
+                    lookupAddress(val, setCity, setProvince, setPostalCode)
+                  }
                 />
                 <Button
                   variant="outlined"
