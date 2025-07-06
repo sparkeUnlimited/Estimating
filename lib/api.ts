@@ -1,5 +1,5 @@
-export const sendEstimateEmail = async (data: any, _pdf: Blob) => {
-  const resp = await fetch("https://api.sparkeunlimited.ca/", {
+export const sendEstimateDetailsLambda = async (data: any, _pdf: Blob) => {
+  const resp = await fetch("https://api.sparkeunlimited.ca/estimate", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,8 +13,4 @@ export const sendEstimateEmail = async (data: any, _pdf: Blob) => {
   }
 
   return resp.json();
-};
-
-export const ensureCustomerFolder = async (path: string) => {
-  console.log("Ensuring folder exists:", path);
 };
