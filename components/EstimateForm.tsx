@@ -27,7 +27,7 @@ import {
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { sendEstimateEmail, ensureCustomerFolder } from "@/lib/api";
+import { sendEstimateDetailsLambda } from "@/lib/api";
 
 const capitalizeWords = (value: string) =>
   value
@@ -215,6 +215,7 @@ const EstimateForm = () => {
         email,
       },
       estimate: {
+
         workType,
         labourRate,
         rows,
@@ -238,11 +239,11 @@ const EstimateForm = () => {
           grandTotal,
         },
       },
+
     };
 
     const pdfBlob = new Blob([], { type: "application/pdf" });
-    await ensureCustomerFolder(`${fullName}_${address}`);
-    await sendEstimateEmail(data, pdfBlob);
+    await sendEstimateDetailsLambda(data.customer, pdfBlob);
   };
 
   return (
