@@ -27,7 +27,8 @@ import {
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { sendEstimateEmail, ensureCustomerFolder } from "@/lib/api";
+import { sendEstimateDetailsLambda } from "@/lib/api";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 const capitalizeWords = (value: string) =>
   value
@@ -214,33 +215,36 @@ const EstimateForm = () => {
         phone,
         email,
       },
-      workType,
-      labourRate,
-      rows,
-      markup,
-      overhead,
-      esaFee,
-      hydroFee,
-      discountType,
-      discountValue,
-      totals: {
-        materialSum,
-        labourExtensionSum,
-        totalLabourCost,
-        totalMaterial,
-        baseCost,
-        markupAmt,
-        overheadAmt,
-        cost,
-        warrantyAmt,
-        discountAmt,
-        grandTotal,
+      estimate: {
+
+        workType,
+        labourRate,
+        rows,
+        markup,
+        overhead,
+        esaFee,
+        hydroFee,
+        discountType,
+        discountValue,
+        totals: {
+          materialSum,
+          labourExtensionSum,
+          totalLabourCost,
+          totalMaterial,
+          baseCost,
+          markupAmt,
+          overheadAmt,
+          cost,
+          warrantyAmt,
+          discountAmt,
+          grandTotal,
+        },
       },
+
     };
 
     const pdfBlob = new Blob([], { type: "application/pdf" });
-    await ensureCustomerFolder(`${fullName}_${address}`);
-    await sendEstimateEmail(data, pdfBlob);
+    await sendEstimateDetailsLambda(data.customer, pdfBlob);
   };
 
   return (
@@ -263,23 +267,16 @@ const EstimateForm = () => {
           </Grid>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Stack direction="row" spacing={1}>
-                <TextField
-                  label="Address"
+        
+                <AddressAutocomplete
+                  
                   value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                  fullWidth
-                />
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    lookupAddress(address, setCity, setProvince, setPostalCode)
+                  onChange={(val) => setAddress(val)}
+                  onSelect={(val) =>
+                    lookupAddress(val, setCity, setProvince, setPostalCode)
                   }
-                >
-                  Lookup
-                </Button>
-              </Stack>
+                />
+       
             </Grid>
           </Grid>
           <Grid container spacing={2}>
