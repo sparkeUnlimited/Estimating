@@ -29,6 +29,48 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { sendEstimateEmail, ensureCustomerFolder } from "@/lib/api";
 
+const capitalizeWords = (value: string) =>
+  value
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+
+const lookupAddress = async (
+  address: string,
+  setCity: (s: string) => void,
+  setProvince: (s: string) => void,
+  setPostalCode: (s: string) => void
+) => {
+  if (!address) {
+    return;
+  }
+  try {
+    const resp = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+        address
+      )}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+    );
+    const data = await resp.json();
+    if (data.status === "OK" && data.results[0]) {
+      const comps = data.results[0].address_components;
+      const get = (type: string) =>
+        comps.find((c: any) => c.types.includes(type))?.short_name || "";
+      setCity(get("locality") || get("postal_town"));
+      setProvince(get("administrative_area_level_1"));
+      const pc = get("postal_code");
+      if (pc) {
+        setPostalCode(formatPostalCode(pc));
+      }
+    }
+  } catch (err) {
+    console.error("Address lookup failed", err);
+  }
+};
+
+const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
+const phoneRegex = /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
+
 const provinces = [
   { code: "AB", name: "Alberta" },
   { code: "BC", name: "British Columbia" },
@@ -213,7 +255,7 @@ const EstimateForm = () => {
               <TextField
                 label="Full Name"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => setFullName(capitalizeWords(e.target.value))}
                 required
                 fullWidth
               />
@@ -221,13 +263,23 @@ const EstimateForm = () => {
           </Grid>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="Address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                required
-                fullWidth
-              />
+              <Stack direction="row" spacing={1}>
+                <TextField
+                  label="Address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                  fullWidth
+                />
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    lookupAddress(address, setCity, setProvince, setPostalCode)
+                  }
+                >
+                  Lookup
+                </Button>
+              </Stack>
             </Grid>
           </Grid>
           <Grid container spacing={2}>
@@ -263,6 +315,10 @@ const EstimateForm = () => {
                 value={postalCode}
                 onChange={(e) => setPostalCode(formatPostalCode(e.target.value))}
                 required
+                inputProps={{
+                  pattern: postalRegex.source,
+                  title: "Format A1A 1A1",
+                }}
                 fullWidth
               />
             </Grid>
@@ -285,6 +341,11 @@ const EstimateForm = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
+                type="tel"
+                inputProps={{
+                  pattern: phoneRegex.source,
+                  title: "Valid Canadian phone number",
+                }}
               />
               <TextField
                 label="Email"
@@ -299,7 +360,7 @@ const EstimateForm = () => {
               Estimate Items
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
-              <FormControl fullWidth sx={{ mb: { xs: 2, sm: 3 } }}>
+              <FormControl fullWidth required sx={{ mb: { xs: 2, sm: 3 } }}>
                 <InputLabel id="wt">Work Type</InputLabel>
                 <Select
                   labelId="wt"
@@ -342,6 +403,7 @@ const EstimateForm = () => {
                                 fullWidth
                                 value={row.name}
                                 onChange={(e) => updateRow(idx, { name: e.target.value })}
+                                required
                                 slotProps={{
                                   input: {
                                     inputProps: { maxLength: 255 },
