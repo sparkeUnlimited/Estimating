@@ -25,6 +25,7 @@ export default function AddressAutocomplete({
   const [inputValue, setInputValue] = useState(value);
   const [options, setOptions] = useState<PlacePrediction[]>([]);
   const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
+  const ottawa = { lat: 45.4215, lng: -75.6972 };
 
   // Keep the displayed input value in sync with the selected value
   useEffect(() => {
@@ -45,7 +46,13 @@ export default function AddressAutocomplete({
 
     const debounce = setTimeout(() => {
       serviceRef.current!.getPlacePredictions(
-        { input: inputValue, types: ["address"] },
+        {
+          input: inputValue,
+          types: ["address"],
+          componentRestrictions: { country: "ca" },
+          location: new google.maps.LatLng(ottawa.lat, ottawa.lng),
+          radius: 50000,
+        },
         (predictions, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
             setOptions(predictions);
