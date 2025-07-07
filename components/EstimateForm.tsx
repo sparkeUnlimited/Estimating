@@ -64,7 +64,7 @@ const lookupAddress = async (
   }
 };
 
-const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
+// const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
 const phoneRegex = /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
 
 /* const provinces = [
@@ -138,6 +138,8 @@ const EstimateForm = () => {
       setLabourRate(125);
     } else if (workType === "Commercial") {
       setLabourRate(145);
+    } else if (workType === "Mixed") {
+      setLabourRate(145);
     } else {
       setLabourRate(0); // Default or unrecognized type
     }
@@ -145,7 +147,7 @@ const EstimateForm = () => {
 
   const allFieldsFilled = fullName && address && contactMethod && phone && email;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
-  const customerValid = allFieldsFilled && workType !== "Select Type";
+  const customerValid = allFieldsFilled && workType !== "Select Type" && totalFloors;
 
   const addRow = () => {
     setRows((r) => [
@@ -313,6 +315,7 @@ const EstimateForm = () => {
                   <MenuItem value="Select Type">Select Type</MenuItem>
                   <MenuItem value="Residential">Residential</MenuItem>
                   <MenuItem value="Commercial">Commercial</MenuItem>
+                  <MenuItem value="Commercial">Mixed</MenuItem>
                 </Select>
               </FormControl>
               <TextField
