@@ -54,9 +54,8 @@ const lookupAddress = async (
     );
     const data = await resp.json();
     if (data.status === "OK" && data.results[0]) {
-      const comps = data.results[0].address_components;
-      const get = (type: string) =>
-        comps.find((c: any) => c.types.includes(type))?.short_name || "";
+      const comps = data.results[0].address_components as google.maps.GeocoderAddressComponent[];
+      const get = (type: string) => comps.find((c) => c.types.includes(type))?.short_name || "";
       setCity(get("locality") || get("postal_town"));
       setProvince(get("administrative_area_level_1"));
       const pc = get("postal_code");
@@ -216,7 +215,6 @@ const EstimateForm = () => {
         email,
       },
       estimate: {
-
         workType,
         labourRate,
         rows,
@@ -240,7 +238,6 @@ const EstimateForm = () => {
           grandTotal,
         },
       },
-
     };
 
     const pdfBlob = new Blob([], { type: "application/pdf" });
@@ -267,16 +264,11 @@ const EstimateForm = () => {
           </Grid>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-        
-                <AddressAutocomplete
-                  
-                  value={address}
-                  onChange={(val) => setAddress(val)}
-                  onSelect={(val) =>
-                    lookupAddress(val, setCity, setProvince, setPostalCode)
-                  }
-                />
-       
+              <AddressAutocomplete
+                value={address}
+                onChange={(val) => setAddress(val)}
+                onSelect={(val) => lookupAddress(val, setCity, setProvince, setPostalCode)}
+              />
             </Grid>
           </Grid>
           <Grid container spacing={2}>
@@ -446,7 +438,11 @@ const EstimateForm = () => {
                               <Select
                                 size="small"
                                 value={row.unit}
-                                onChange={(e) => updateRow(idx, { unit: e.target.value as any })}
+                                onChange={(e) =>
+                                  updateRow(idx, {
+                                    unit: e.target.value as EstimateRow["unit"],
+                                  })
+                                }
                               >
                                 <MenuItem value="Each">Each</MenuItem>
                                 <MenuItem value="C">C</MenuItem>
@@ -470,7 +466,8 @@ const EstimateForm = () => {
                                 value={row.labourUnitMultiplier}
                                 onChange={(e) =>
                                   updateRow(idx, {
-                                    labourUnitMultiplier: e.target.value as any,
+                                    labourUnitMultiplier: e.target
+                                      .value as EstimateRow["labourUnitMultiplier"],
                                   })
                                 }
                               >
@@ -537,7 +534,7 @@ const EstimateForm = () => {
                           Total Cost
                         </Typography>
                       </TableCell>
-                      
+
                       <TableCell>
                         <Typography variant="h6" fontWeight="bold">
                           {baseCost.toFixed(2)}
@@ -561,17 +558,13 @@ const EstimateForm = () => {
                         <Typography variant="h6" fontWeight="bold">
                           Markup
                         </Typography>
-                        <Typography >
-                          On Material Only
-                        </Typography>
+                        <Typography>On Material Only</Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="h6" fontWeight="bold">
                           Overhead
                         </Typography>
-                        <Typography >
-                         Material + Labour
-                        </Typography>
+                        <Typography>Material + Labour</Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="h6" fontWeight="bold">
