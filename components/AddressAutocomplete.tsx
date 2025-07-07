@@ -21,7 +21,10 @@ export default function AddressAutocomplete({
   const [options, setOptions] = useState<google.maps.places.AutocompletePrediction[]>([]);
   const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
 
-  const ottawa = new google.maps.LatLng(45.4215, -75.6972);
+  // Use a LatLngLiteral so we don't rely on the Google object being loaded
+  // before rendering. This will keep Ottawa as the initial focus without
+  // causing reference errors when the component first mounts.
+  const ottawa = { lat: 45.4215, lng: -75.6972 };
 
   useEffect(() => {
     setInputValue(value);
