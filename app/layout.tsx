@@ -1,6 +1,6 @@
 import "/styles/globals.css";
 import "/styles/calendar.css";
-import Script from "next/script";
+import { GoogleMapsProvider } from "@/components/providers/GoogleMapsProvider";
 
 export const metadata = {
   title: "Estimating App - Spark-E",
@@ -10,15 +10,11 @@ export const metadata = {
     "electrician, contractor, estimating, estimate, EV chargers, panel upgrades, energy-efficient, fire alarm, commercial, residential",
 };
 
-const RootLayout = ({ children }) => (
+const RootLayout = ({ children }: { children: React.ReactNode }) => (
   <html lang="en">
-    <head>
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-        strategy="afterInteractive"
-      />
-    </head>
-    <body>{children}</body>
+    <body>
+      <GoogleMapsProvider>{children}</GoogleMapsProvider>
+    </body>
   </html>
 );
 
