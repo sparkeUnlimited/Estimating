@@ -26,6 +26,11 @@ export default function AddressAutocomplete({
   const [options, setOptions] = useState<PlacePrediction[]>([]);
   const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
 
+  // Keep the displayed input value in sync with the selected value
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
   useEffect(() => {
     if (loaded && window.google && !serviceRef.current) {
       serviceRef.current = new google.maps.places.AutocompleteService();
@@ -65,6 +70,7 @@ export default function AddressAutocomplete({
       value={options.find((opt) => opt.description === value) || null}
       onChange={(_, newValue) => {
         if (newValue) {
+          setInputValue(newValue.description);
           onChange(newValue.description);
           if (onSelect) onSelect(newValue.description);
         }
