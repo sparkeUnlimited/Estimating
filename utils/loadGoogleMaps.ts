@@ -5,4 +5,4 @@ const loader = new Loader({
   libraries: ["places"],
 });
 
-export const loadGoogleMaps = () => loader.load();
+export const loadGoogleMaps = () => loader.importLibrary("places");

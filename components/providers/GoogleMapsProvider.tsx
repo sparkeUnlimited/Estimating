@@ -14,9 +14,18 @@ export const GoogleMapsProvider = ({ children }: { children: React.ReactNode }) 
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    loader.load().then(() => {
-      setLoaded(true);
-    });
+    let mounted = true;
+    loader
+      .importLibrary("places")
+      .then(() => {
+        if (mounted) setLoaded(true);
+      })
+      .catch(() => {
+        if (mounted) setLoaded(false);
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return <GoogleMapsContext.Provider value={{ loaded }}>{children}</GoogleMapsContext.Provider>;
