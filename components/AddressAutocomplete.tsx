@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { useGoogleMaps } from "@/components/providers/GoogleMapsProvider";
@@ -10,10 +10,6 @@ interface AddressAutocompleteProps {
   onSelect?: (value: string) => void;
 }
 
-interface PlacePrediction {
-  description: string;
-  place_id: string;
-}
 
 export default function AddressAutocomplete({
   label = "Address",
@@ -23,50 +19,58 @@ export default function AddressAutocomplete({
 }: AddressAutocompleteProps) {
   const { loaded } = useGoogleMaps();
   const [inputValue, setInputValue] = useState(value);
-  const [options, setOptions] = useState<PlacePrediction[]>([]);
-  const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
+  const [options, setOptions] = useState<google.maps.places.PlacePrediction[]>([]);
+  const ottawa = { lat: 45.4215, lng: -75.6972 };
+
+  // Keep the displayed input value in sync with the selected value
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   useEffect(() => {
-    if (loaded && window.google && !serviceRef.current) {
-      serviceRef.current = new google.maps.places.AutocompleteService();
-    }
-  }, [loaded]);
-
-  useEffect(() => {
-    if (!serviceRef.current || !inputValue) {
+    if (!loaded || !window.google || !inputValue) {
       setOptions([]);
       return;
     }
 
     const debounce = setTimeout(() => {
-      serviceRef.current!.getPlacePredictions(
-        { input: inputValue, types: ["address"] },
-        (predictions, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-            setOptions(predictions);
-          } else {
-            setOptions([]);
-          }
-        }
-      );
+      google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: inputValue,
+        includedPrimaryTypes: ["address"],
+        includedRegionCodes: ["ca"],
+        locationBias: {
+          center: { lat: ottawa.lat, lng: ottawa.lng },
+          radius: 50000,
+        },
+      })
+        .then(({ suggestions }) => {
+          const predictions = suggestions
+            .map((s) => s.placePrediction)
+            .filter(
+              (p): p is google.maps.places.PlacePrediction => p !== null
+            );
+          setOptions(predictions);
+        })
+        .catch(() => setOptions([]));
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [inputValue]);
+  }, [inputValue, loaded]);
 
   return (
     <Autocomplete
       options={options}
-      getOptionLabel={(option) => option.description}
+      getOptionLabel={(option) => option.text.text}
       filterOptions={(x) => x}
       autoComplete
       includeInputInList
       fullWidth
-      value={options.find((opt) => opt.description === value) || null}
+      value={options.find((opt) => opt.text.text === value) || null}
       onChange={(_, newValue) => {
         if (newValue) {
-          onChange(newValue.description);
-          if (onSelect) onSelect(newValue.description);
+          setInputValue(newValue.text.text);
+          onChange(newValue.text.text);
+          if (onSelect) onSelect(newValue.text.text);
         }
       }}
       inputValue={inputValue}

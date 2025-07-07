@@ -26,17 +26,17 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import Grid from '@mui/material/Grid';
+import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { sendEstimateDetailsLambda } from "@/lib/api";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 const lookupAddress = async (
-  address: string,
-  setCity: (s: string) => void,
+  address: string
+  /* setCity: (s: string) => void,
   setProvince: (s: string) => void,
-  setPostalCode: (s: string) => void
+  setPostalCode: (s: string) => void */
 ) => {
   if (!address) {
     return;
@@ -51,12 +51,12 @@ const lookupAddress = async (
     if (data.status === "OK" && data.results[0]) {
       const comps = data.results[0].address_components as google.maps.GeocoderAddressComponent[];
       const get = (type: string) => comps.find((c) => c.types.includes(type))?.short_name || "";
-      setCity(get("locality") || get("postal_town"));
+      /* setCity(get("locality") || get("postal_town"));
       setProvince(get("administrative_area_level_1"));
       const pc = get("postal_code");
       if (pc) {
         setPostalCode(formatPostalCode(pc));
-      }
+      } */
     }
   } catch (err) {
     console.error("Address lookup failed", err);
@@ -66,7 +66,7 @@ const lookupAddress = async (
 const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
 const phoneRegex = /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
 
-const provinces = [
+/* const provinces = [
   { code: "AB", name: "Alberta" },
   { code: "BC", name: "British Columbia" },
   { code: "MB", name: "Manitoba" },
@@ -80,14 +80,14 @@ const provinces = [
   { code: "QC", name: "Quebec" },
   { code: "SK", name: "Saskatchewan" },
   { code: "YT", name: "Yukon" },
-] as const;
+] as const; */
 
-const formatPostalCode = (value: string) => {
+/* const formatPostalCode = (value: string) => {
   const upper = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
   const first = upper.slice(0, 3);
   const last = upper.slice(3, 6);
   return last ? `${first} ${last}` : first;
-};
+}; */
 
 export type EstimateRow = {
   name: string;
@@ -103,9 +103,9 @@ const unitDivisor = { Each: 1, C: 100, M: 1000 } as const;
 const EstimateForm = () => {
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
+  /* const [city, setCity] = useState("");
   const [province, setProvince] = useState("ON");
-  const [postalCode, setPostalCode] = useState("");
+  const [postalCode, setPostalCode] = useState(""); */
   const [contactMethod, setContactMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -141,9 +141,8 @@ const EstimateForm = () => {
     }
   }, [workType]);
 
-  const allFieldsFilled =
-    fullName && address && city && province && postalCode && contactMethod && phone && email;
-
+  const allFieldsFilled = fullName && address && contactMethod && phone && email;
+  // fullName && address && city && province && postalCode && contactMethod && phone && email;
   const customerValid = allFieldsFilled && workType !== "Select Type";
 
   const addRow = () => {
@@ -202,9 +201,6 @@ const EstimateForm = () => {
       customer: {
         fullName,
         address,
-        city,
-        province,
-        postalCode,
         contactMethod,
         phone,
         email,
@@ -247,7 +243,7 @@ const EstimateForm = () => {
             Customer Information
           </Typography>
           <Grid container spacing={2}>
-           <Grid size={12}>
+            <Grid size={12}>
               <TextField
                 label="Full Name"
                 value={fullName}
@@ -262,51 +258,11 @@ const EstimateForm = () => {
               <AddressAutocomplete
                 value={address}
                 onChange={(val) => setAddress(val)}
-                onSelect={(val) => lookupAddress(val, setCity, setProvince, setPostalCode)}
+                onSelect={(val) => lookupAddress(val)}
               />
             </Grid>
           </Grid>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="City"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                required
-                fullWidth
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth required>
-                <InputLabel id="prov">Province</InputLabel>
-                <Select
-                  labelId="prov"
-                  label="Province"
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                >
-                  {provinces.map((p) => (
-                    <MenuItem key={p.code} value={p.code}>
-                      {p.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="Postal Code"
-                value={postalCode}
-                onChange={(e) => setPostalCode(formatPostalCode(e.target.value))}
-                required
-                inputProps={{
-                  pattern: postalRegex.source,
-                  title: "Format A1A 1A1",
-                }}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
+
           <Box>
             <Typography fontWeight="medium" gutterBottom>
               Preferred Contact
