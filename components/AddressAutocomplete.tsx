@@ -19,11 +19,11 @@ export default function AddressAutocomplete({
 }: AddressAutocompleteProps) {
   const [inputValue, setInputValue] = useState(value);
   const [options, setOptions] = useState<string[]>([]);
-  const serviceRef = useRef<any>(null);
+  const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).google && !serviceRef.current) {
-      serviceRef.current = new (window as any).google.maps.places.AutocompleteService();
+    if (typeof window !== "undefined" && window.google && !serviceRef.current) {
+      serviceRef.current = new window.google.maps.places.AutocompleteService();
     }
   }, []);
 
@@ -33,9 +33,12 @@ export default function AddressAutocomplete({
       return;
     }
 
-    serviceRef.current.getPlacePredictions({ input: inputValue, types: ["address"] }, (predictions) => {
-      setOptions(predictions ? predictions.map((p) => p.description) : []);
-    });
+    serviceRef.current.getPlacePredictions(
+      { input: inputValue, types: ["address"] },
+      (predictions) => {
+        setOptions(predictions ? predictions.map((p) => p.description) : []);
+      }
+    );
   }, [inputValue]);
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export default function AddressAutocomplete({
           onSelect(val);
         }
       }}
-      renderInput={(params) => <TextField {...params} label={label} required fullWidth />}    
+      renderInput={(params) => <TextField {...params} label={label} required fullWidth />}
     />
   );
 }
