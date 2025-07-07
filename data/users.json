@@ -1,0 +1,8 @@
+[
+  {
+    "id": 1,
+    "email": "admin@example.com",
+    "passwordHash": "7d511ba1ecd9c58c71c11b25ad5964e0:4aed60fbbbdabcc93b41be0fb10cd9aaae49bd68f0dddf4a43a2048f2a7cf0fb17ce78b7f4ae6b8a546cff627cb8c3f536bf3be36a05fb3724c734605e1a2248",
+    "approved": true
+  }
+]
