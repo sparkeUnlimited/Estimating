@@ -26,7 +26,7 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import Grid from '@mui/material/Grid';
+import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { sendEstimateDetailsLambda } from "@/lib/api";
@@ -202,9 +202,6 @@ const EstimateForm = () => {
       customer: {
         fullName,
         address,
-        city,
-        province,
-        postalCode,
         contactMethod,
         phone,
         email,
@@ -247,7 +244,7 @@ const EstimateForm = () => {
             Customer Information
           </Typography>
           <Grid container spacing={2}>
-           <Grid size={12}>
+            <Grid size={12}>
               <TextField
                 label="Full Name"
                 value={fullName}
@@ -266,47 +263,7 @@ const EstimateForm = () => {
               />
             </Grid>
           </Grid>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="City"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                required
-                fullWidth
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth required>
-                <InputLabel id="prov">Province</InputLabel>
-                <Select
-                  labelId="prov"
-                  label="Province"
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                >
-                  {provinces.map((p) => (
-                    <MenuItem key={p.code} value={p.code}>
-                      {p.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                label="Postal Code"
-                value={postalCode}
-                onChange={(e) => setPostalCode(formatPostalCode(e.target.value))}
-                required
-                inputProps={{
-                  pattern: postalRegex.source,
-                  title: "Format A1A 1A1",
-                }}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
+
           <Box>
             <Typography fontWeight="medium" gutterBottom>
               Preferred Contact
