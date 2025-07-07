@@ -12,13 +12,13 @@ export const metadata = {
 
 const RootLayout = ({ children }) => (
   <html lang="en">
-    <body>
-      {children}
+    <head>
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         strategy="afterInteractive"
       />
-    </body>
+    </head>
+    <body>{children}</body>
   </html>
 );
 

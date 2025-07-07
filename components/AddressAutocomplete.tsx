@@ -11,6 +11,11 @@ interface AddressAutocompleteProps {
   onSelect?: (value: string) => void;
 }
 
+interface PlacePrediction {
+  description: string;
+  place_id: string;
+}
+
 export default function AddressAutocomplete({
   label = "Address",
   value,
@@ -18,7 +23,7 @@ export default function AddressAutocomplete({
   onSelect,
 }: AddressAutocompleteProps) {
   const [inputValue, setInputValue] = useState(value);
-  const [options, setOptions] = useState<string[]>([]);
+  const [options, setOptions] = useState<PlacePrediction[]>([]);
   const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
 
   useEffect(() => {
@@ -28,41 +33,53 @@ export default function AddressAutocomplete({
   }, []);
 
   useEffect(() => {
-    if (!serviceRef.current || !inputValue) {
-      setOptions([]);
-      return;
-    }
-
-    serviceRef.current.getPlacePredictions(
-      { input: inputValue, types: ["address"] },
-      (predictions) => {
-        setOptions(predictions ? predictions.map((p) => p.description) : []);
+    const fetchPredictions = () => {
+      if (!serviceRef.current || !inputValue) {
+        setOptions([]);
+        return;
       }
-    );
-  }, [inputValue]);
 
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
+      serviceRef.current.getPlacePredictions(
+        { input: inputValue, types: ["address"] },
+        (predictions, status) => {
+          if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
+            setOptions(predictions);
+          } else {
+            setOptions([]);
+          }
+        }
+      );
+    };
+
+    const debounce = setTimeout(fetchPredictions, 300);
+    return () => clearTimeout(debounce);
+  }, [inputValue]);
 
   return (
     <Autocomplete
-      freeSolo
       options={options}
-      inputValue={inputValue}
-      onInputChange={(_, newInput) => {
-        setInputValue(newInput);
-        onChange(newInput);
-      }}
-      value={value}
-      onChange={(_, newValue, reason) => {
-        const val = newValue || "";
-        onChange(val);
-        if (reason === "selectOption" && onSelect) {
-          onSelect(val);
+      getOptionLabel={(option) => option.description}
+      filterOptions={(x) => x} // don’t filter, let Google handle it
+      autoComplete
+      includeInputInList
+      fullWidth
+      value={options.find((opt) => opt.description === value) || null}
+      onChange={(_, newValue) => {
+        if (newValue) {
+          onChange(newValue.description);
+          if (onSelect) {
+            onSelect(newValue.description);
+          }
         }
       }}
-      renderInput={(params) => <TextField {...params} label={label} required fullWidth />}
+      inputValue={inputValue}
+      onInputChange={(_, newInput, reason) => {
+        if (reason === "input") {
+          setInputValue(newInput);
+          onChange(newInput); // reflects current typing in parent state
+        }
+      }}
+      renderInput={(params) => <TextField {...params} label={label} required />}
     />
   );
 }
