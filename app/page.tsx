@@ -1,12 +1,25 @@
 "use client";
 
 import Layout from "@/layout/Layout";
-import EstimateForm from "@/components/EstimateForm";
+import LoginForm from "@/components/LoginForm";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Home = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    fetch("/api/auth/user")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) router.replace("/estimate");
+      })
+      .catch(() => {});
+  }, [router]);
+
   return (
-    <Layout title="Estimate">
-      <EstimateForm />
+    <Layout title="Login">
+      <LoginForm />
     </Layout>
   );
 };
