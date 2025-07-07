@@ -24,18 +24,11 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
+import Grid from '@mui/material/Grid';
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { sendEstimateDetailsLambda } from "@/lib/api";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
-
-const capitalizeWords = (value: string) =>
-  value
-    .split(" ")
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
 
 const lookupAddress = async (
   address: string,
@@ -252,18 +245,18 @@ const EstimateForm = () => {
             Customer Information
           </Typography>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+           <Grid size={12}>
               <TextField
                 label="Full Name"
                 value={fullName}
-                onChange={(e) => setFullName(capitalizeWords(e.target.value))}
+                onChange={(e) => setFullName(e.target.value)}
                 required
                 fullWidth
               />
             </Grid>
           </Grid>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid size={12}>
               <AddressAutocomplete
                 value={address}
                 onChange={(val) => setAddress(val)}
