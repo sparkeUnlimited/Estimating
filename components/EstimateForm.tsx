@@ -31,6 +31,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { sendEstimateDetailsLambda } from "@/lib/api";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import HighRiseLabourAdjuster from "@/components/HighRiseLabourAdjuster";
 
 const lookupAddress = async (
   address: string
@@ -63,7 +64,7 @@ const lookupAddress = async (
   }
 };
 
-const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
+// const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
 const phoneRegex = /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
 
 /* const provinces = [
@@ -122,6 +123,7 @@ const EstimateForm = () => {
   ]);
   const [workType, setWorkType] = useState("Select Type");
   const [labourRate, setLabourRate] = useState(125);
+  const [totalFloors, setTotalFloors] = useState(0);
 
   const [markup, setMarkup] = useState(30);
   const [overhead, setOverhead] = useState(10);
@@ -136,6 +138,8 @@ const EstimateForm = () => {
       setLabourRate(125);
     } else if (workType === "Commercial") {
       setLabourRate(145);
+    } else if (workType === "Mixed") {
+      setLabourRate(145);
     } else {
       setLabourRate(0); // Default or unrecognized type
     }
@@ -143,7 +147,7 @@ const EstimateForm = () => {
 
   const allFieldsFilled = fullName && address && contactMethod && phone && email;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
-  const customerValid = allFieldsFilled && workType !== "Select Type";
+  const customerValid = allFieldsFilled && workType !== "Select Type" && totalFloors;
 
   const addRow = () => {
     setRows((r) => [
@@ -311,8 +315,17 @@ const EstimateForm = () => {
                   <MenuItem value="Select Type">Select Type</MenuItem>
                   <MenuItem value="Residential">Residential</MenuItem>
                   <MenuItem value="Commercial">Commercial</MenuItem>
+                  <MenuItem value="Commercial">Mixed</MenuItem>
                 </Select>
               </FormControl>
+              <TextField
+                label="How many floors in the building?"
+                type="number"
+                fullWidth
+                value={totalFloors || ""}
+                onChange={(e) => setTotalFloors(parseInt(e.target.value))}
+                margin="normal"
+              />
               <TextField
                 label="Labour Rate"
                 size="small"
@@ -322,6 +335,8 @@ const EstimateForm = () => {
               />
             </Stack>
           </Box>
+
+          <HighRiseLabourAdjuster totalFloors={totalFloors} />
 
           {customerValid && (
             <>
