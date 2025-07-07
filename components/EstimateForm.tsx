@@ -31,6 +31,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { sendEstimateDetailsLambda } from "@/lib/api";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import HighRiseLabourAdjuster from "@/components/HighRiseLabourAdjuster";
 
 const lookupAddress = async (
   address: string
@@ -122,6 +123,7 @@ const EstimateForm = () => {
   ]);
   const [workType, setWorkType] = useState("Select Type");
   const [labourRate, setLabourRate] = useState(125);
+  const [totalFloors, setTotalFloors] = useState(0);
 
   const [markup, setMarkup] = useState(30);
   const [overhead, setOverhead] = useState(10);
@@ -314,6 +316,14 @@ const EstimateForm = () => {
                 </Select>
               </FormControl>
               <TextField
+                label="How many floors in the building?"
+                type="number"
+                fullWidth
+                value={totalFloors || ""}
+                onChange={(e) => setTotalFloors(parseInt(e.target.value))}
+                margin="normal"
+              />
+              <TextField
                 label="Labour Rate"
                 size="small"
                 type="number"
@@ -322,6 +332,8 @@ const EstimateForm = () => {
               />
             </Stack>
           </Box>
+
+          <HighRiseLabourAdjuster totalFloors={totalFloors} />
 
           {customerValid && (
             <>
