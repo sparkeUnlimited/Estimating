@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { useGoogleMaps } from "@/components/providers/GoogleMapsProvider";
@@ -10,7 +10,6 @@ interface AddressAutocompleteProps {
   onSelect?: (value: string) => void;
 }
 
-
 export default function AddressAutocomplete({
   label = "Address",
   value,
@@ -19,10 +18,11 @@ export default function AddressAutocomplete({
 }: AddressAutocompleteProps) {
   const { loaded } = useGoogleMaps();
   const [inputValue, setInputValue] = useState(value);
-  const [options, setOptions] = useState<google.maps.places.PlacePrediction[]>([]);
-  const ottawa = { lat: 45.4215, lng: -75.6972 };
+  const [options, setOptions] = useState<google.maps.places.AutocompletePrediction[]>([]);
+  const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null);
 
-  // Keep the displayed input value in sync with the selected value
+  const ottawa = new google.maps.LatLng(45.4215, -75.6972);
+
   useEffect(() => {
     setInputValue(value);
   }, [value]);
@@ -33,25 +33,29 @@ export default function AddressAutocomplete({
       return;
     }
 
+    if (!serviceRef.current) {
+      serviceRef.current = new google.maps.places.AutocompleteService();
+    }
+
     const debounce = setTimeout(() => {
-      google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-        input: inputValue,
-        includedPrimaryTypes: ["address"],
-        includedRegionCodes: ["ca"],
-        locationBias: {
-          center: { lat: ottawa.lat, lng: ottawa.lng },
-          radius: 50000,
+      serviceRef.current?.getPlacePredictions(
+        {
+          input: inputValue,
+          types: ["address"],
+          componentRestrictions: { country: "ca" },
+          locationBias: {
+            radius: 50000,
+            center: ottawa,
+          },
         },
-      })
-        .then(({ suggestions }) => {
-          const predictions = suggestions
-            .map((s) => s.placePrediction)
-            .filter(
-              (p): p is google.maps.places.PlacePrediction => p !== null
-            );
-          setOptions(predictions);
-        })
-        .catch(() => setOptions([]));
+        (predictions) => {
+          if (predictions) {
+            setOptions(predictions);
+          } else {
+            setOptions([]);
+          }
+        }
+      );
     }, 300);
 
     return () => clearTimeout(debounce);
@@ -60,17 +64,17 @@ export default function AddressAutocomplete({
   return (
     <Autocomplete
       options={options}
-      getOptionLabel={(option) => option.text.text}
-      filterOptions={(x) => x}
+      getOptionLabel={(option) => option.description}
+      filterOptions={(x) => x} // Disable built-in filtering
       autoComplete
       includeInputInList
       fullWidth
-      value={options.find((opt) => opt.text.text === value) || null}
+      value={options.find((opt) => opt.description === value) || null}
       onChange={(_, newValue) => {
         if (newValue) {
-          setInputValue(newValue.text.text);
-          onChange(newValue.text.text);
-          if (onSelect) onSelect(newValue.text.text);
+          setInputValue(newValue.description);
+          onChange(newValue.description);
+          if (onSelect) onSelect(newValue.description);
         }
       }}
       inputValue={inputValue}
