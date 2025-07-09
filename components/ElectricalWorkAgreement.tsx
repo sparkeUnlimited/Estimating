@@ -59,9 +59,7 @@ export default function ElectricalWorkAgreement({
             {section.title}
           </Typography>
           {section.text && (
-            <Typography sx={{ mt: 1 }}>
-              {replacePlaceholders(section.text)}
-            </Typography>
+            <Typography sx={{ mt: 1 }}>{replacePlaceholders(section.text)}</Typography>
           )}
           {section.subsections?.map((sub, subIdx) => (
             <Fragment key={subIdx}>
@@ -77,7 +75,7 @@ export default function ElectricalWorkAgreement({
       <FormControlLabel
         sx={{ mt: 3 }}
         control={<Checkbox required checked={ack} onChange={(e) => setAck(e.target.checked)} />}
-        label="I have read and agree to the terms above"
+        label={agreementText.acknowledgment}
       />
 
       <Typography variant="h6" sx={{ mt: 2 }}>
@@ -92,14 +90,34 @@ export default function ElectricalWorkAgreement({
               onSignature?.(sig);
             }}
           />
-          <TextField label="Name (Printed)" fullWidth value={clientName} sx={{ mt: 1 }} InputProps={{ readOnly: true }} />
-          <TextField label="Date" type="date" value={date} sx={{ mt: 1 }} InputLabelProps={{ shrink: true }} fullWidth />
+          <TextField
+            label="Name (Printed)"
+            fullWidth
+            value={clientName}
+            sx={{ mt: 1 }}
+            InputProps={{ readOnly: true }}
+          />
+          <TextField
+            label="Date"
+            type="date"
+            value={date}
+            sx={{ mt: 1 }}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+          />
         </Box>
         <Box>
           <Typography>Contractor Signature:</Typography>
           <SignaturePad onChange={setContractorSig} />
           <Typography sx={{ mt: 1 }}>Ryan Maxwell, Spark-E Unlimited</Typography>
-          <TextField label="Date" type="date" value={date} sx={{ mt: 1 }} InputLabelProps={{ shrink: true }} fullWidth />
+          <TextField
+            label="Date"
+            type="date"
+            value={date}
+            sx={{ mt: 1 }}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+          />
         </Box>
       </Stack>
     </Box>
