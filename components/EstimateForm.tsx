@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -29,7 +30,6 @@ import {
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { sendEstimateDetailsLambda } from "@/lib/api";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import HighRiseLabourAdjuster from "@/components/HighRiseLabourAdjuster";
 
@@ -132,6 +132,12 @@ const EstimateForm = () => {
   const [hydroFee, setHydroFee] = useState(0);
   const [discountType, setDiscountType] = useState("None");
   const [discountValue, setDiscountValue] = useState(0);
+  const [date] = useState(new Date().toISOString().slice(0, 10));
+  const [depositAmount, setDepositAmount] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [completionDate, setCompletionDate] = useState("");
+
+  const router = useRouter();
 
   useEffect(() => {
     if (workType === "Residential") {
@@ -199,9 +205,10 @@ const EstimateForm = () => {
 
   const grandTotal = subtotal - discountAmt;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
     const data = {
+      date,
       customer: {
         fullName,
         address,
@@ -217,6 +224,9 @@ const EstimateForm = () => {
         overhead,
         esaFee,
         hydroFee,
+        startDate,
+        completionDate,
+        depositAmount,
         discountType,
         discountValue,
         totals: {
@@ -235,14 +245,34 @@ const EstimateForm = () => {
       },
     };
 
-    const pdfBlob = new Blob([], { type: "application/pdf" });
-    await sendEstimateDetailsLambda(data, pdfBlob);
+    localStorage.setItem("estimateData", JSON.stringify(data));
+    localStorage.setItem(
+      "agreementData",
+      JSON.stringify({
+        clientName: fullName,
+        projectAddress: address,
+        date,
+        estimatedTotal: grandTotal.toFixed(2),
+        depositAmount,
+        startDate,
+        completionDate,
+      })
+    );
+
+    router.push("/agreement");
   };
 
   return (
     <Paper sx={{ p: 4 }} elevation={4}>
-      <Box component="form" onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleNext}>
         <Stack spacing={3}>
+          <TextField
+            label="Date"
+            type="date"
+            value={date}
+            InputLabelProps={{ shrink: true }}
+            InputProps={{ readOnly: true }}
+          />
           <Typography variant="h5" fontWeight="bold">
             Customer Information
           </Typography>
@@ -298,6 +328,28 @@ const EstimateForm = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 fullWidth
+              />
+            </Stack>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
+              <TextField
+                label="Deposit Amount"
+                type="number"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+              />
+              <TextField
+                label="Project Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                label="Project Completion Date"
+                type="date"
+                value={completionDate}
+                onChange={(e) => setCompletionDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
               />
             </Stack>
             <Typography variant="h6" fontWeight="bold" my={4}>
@@ -677,9 +729,22 @@ const EstimateForm = () => {
               <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
-              <Button type="submit" variant="contained">
-                Submit Estimate
-              </Button>
+              <Stack direction="row" spacing={2} mt={2}>
+                <Button variant="contained" disabled>
+                  Back
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={() => router.push("/")}
+                >
+                  Cancel
+                </Button>
+                <Box sx={{ flexGrow: 1 }} />
+                <Button type="submit" variant="contained" disabled={!customerValid}>
+                  Next
+                </Button>
+              </Stack>
             </>
           )}
         </Stack>

@@ -1,0 +1,82 @@
+{
+  "intro": "Between Spark-E Unlimited (\u201cContractor\u201d) and the Client listed above, this Agreement governs the provision of electrical services.",
+  "acknowledgment": "I have read, understand, and agree to all terms and conditions set forth in this Electrical Work Agreement, and I hereby acknowledge that this document constitutes a legally binding contract between myself and Spark-E Unlimited.",
+  "sections": [
+    {
+      "title": "1. Scope of Work",
+      "body": "Contractor will perform electrical services as described in the attached estimate or in writing. Any change orders must be approved in writing by Client and may incur additional fees"
+    },
+    {
+      "title": "2. Licensing & Compliance",
+      "body": "Contractor confirms it holds a valid Ontario Electrical Safety Authority (ESA) contractor licence and that all work will be performed by licensed personnel in compliance with the Ontario Electrical Code and ESA regulations ."
+    },
+    {
+      "title": "3. Estimate & Payment Terms",
+      "body": [
+        "Estimated Total (ex. tax): ${{estimatedTotal}}",
+        "Deposit: 50% due before work commences (${{depositAmount}})",
+        "Final Payment: Due upon project completion",
+        "Accepted payment methods: e-transfer, cheque, or methods approved by Contractor. Late payment may incur interest or collection fees."
+      ]
+    },
+    {
+      "title": "4. Schedule",
+      "body": [
+        "Start On or Around: {{startDate}}",
+        "Estimated Completion Date: {{completionDate}}",
+        "Schedule may shift due to weather, supply delays, or unforeseen conditions."
+      ]
+    },
+    {
+      "title": "5. Materials & Equipment",
+      "body": "Specify who supplies materials: Contractor-supplied materials are included in estimate; Client-supplied or special-order materials may result in additional charges."
+    },
+    {
+      "title": "6. Permits & Inspections",
+      "body": "Contractor will obtain electrical permits and arrange ESA inspections. Fees are included unless otherwise noted."
+    },
+    {
+      "title": "7. Warranty",
+      "body": "Contractor provides a one-year workmanship warranty covering installation defects. Coordination of ESA inspection is included. Warranty does not cover noncontracted modifications, misuse, system alterations, or third-party damages"
+    },
+    {
+      "title": "8. Indemnification & Insurance",
+      "body": "Client and Contractor agree to indemnify and hold harmless the other from claims due to negligence or breach, except for gross negligence or willful misconduct. Contractor maintains liability insurance and can provide proof upon request ."
+    },
+    {
+      "title": "9. Limitation of Liability",
+      "body": "Contractor is not liable for delays, defects, or damage caused by pre-existing conditions, force majeure, or third parties. Damage due to Client-supplied materials, site conditions, or delays is excluded."
+    },
+    {
+      "title": "10. Confidentiality",
+      "body": "Both parties agree to keep the terms of this Agreement and related documents confidential and not disclose them to third parties without consent."
+    },
+    {
+      "title": "11. Assignment & Delegation",
+      "body": "Neither party may assign or delegate their rights or obligations under this Agreement without prior written consent. Contractor may subcontract portions of the work, but remains responsible for performance quality."
+    },
+    {
+      "title": "12. Cancellations & Rescheduling",
+      "body": [
+        "Cancellation less than 48 hours before start forfeits deposit.",
+        "Rescheduling must be requested at least 48 hours prior."
+      ]
+    },
+    {
+      "title": "13. Exclusivity & Commitment",
+      "body": "Upon payment of deposit and signing this Agreement, the Client agrees not to contract other providers for the same work unless this Agreement is formally canceled in writing."
+    },
+    {
+      "title": "14. Term & Termination",
+      "body": "The Agreement remains in force until work is completed or one party terminates in writing. Early termination by Client requires written notice; Contractor may retain deposit and payment for completed work."
+    },
+    {
+      "title": "15. Dispute Resolution & Governing Law",
+      "body": "Disputes will first be addressed by informal negotiations. If unresolved, parties agree to mediation or arbitration in Ontario under Ontario law. Governing law: laws of Ontario."
+    },
+    {
+      "title": "16. Entire Agreement",
+      "body": "This document plus attached estimate or change orders constitutes the entire agreement and supersedes prior understandings. Amendments must be in writing and signed by both parties."
+    }
+  ]
+}
