@@ -62,14 +62,18 @@ export default function ElectricalWorkAgreement({
             {section.title}
           </Typography>
           {section.text && (
-            <Typography sx={{ mt: 1 }}>{replacePlaceholders(section.text)}</Typography>
+            <Typography sx={{ mt: 1, whiteSpace: "pre-line" }}>
+              {replacePlaceholders(section.text)}
+            </Typography>
           )}
           {section.subsections?.map((sub, subIdx) => (
             <Fragment key={subIdx}>
               <Typography variant="subtitle1" sx={{ mt: 1 }}>
                 {sub.title}
               </Typography>
-              <Typography>{replacePlaceholders(sub.text)}</Typography>
+              <Typography sx={{ whiteSpace: "pre-line" }}>
+                {replacePlaceholders(sub.text)}
+              </Typography>
             </Fragment>
           ))}
         </Fragment>
