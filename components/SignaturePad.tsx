@@ -61,8 +61,8 @@ export default function SignaturePad({ onChange }: Props) {
     <Box>
       <canvas
         ref={canvasRef}
-        width={300}
-        height={150}
+        width={400}
+        height={200}
         style={{ border: "1px solid #000", touchAction: "none" }}
         onPointerDown={start}
         onPointerMove={draw}

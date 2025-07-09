@@ -120,6 +120,8 @@ const EstimateForm = () => {
   const [contactMethod, setContactMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
 
   const [rows, setRows] = useState<EstimateRow[]>([
     {
@@ -164,6 +166,8 @@ const EstimateForm = () => {
       setContactMethod(c.contactMethod || "");
       setPhone(c.phone || "");
       setEmail(c.email || "");
+      setProjectName(c.projectName || "");
+      setProjectDescription(c.projectDescription || "");
       setRows(
         e.rows || [
           {
@@ -209,7 +213,14 @@ const EstimateForm = () => {
   //const allFieldsFilled = fullName && address && contactMethod && phone && email && totalFloors;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
   const customerValid =
-    fullName && address && contactMethod && phone && email && workType !== "Select Type";
+    fullName &&
+    address &&
+    projectName &&
+    projectDescription &&
+    contactMethod &&
+    phone &&
+    email &&
+    workType !== "Select Type";
 
   const addRow = () => {
     setRows((r) => [
@@ -278,6 +289,8 @@ const EstimateForm = () => {
       customer: {
         fullName,
         address,
+        projectName,
+        projectDescription,
         contactMethod,
         phone,
         email,
@@ -316,6 +329,8 @@ const EstimateForm = () => {
     localStorage.setItem(
       "agreementData",
       JSON.stringify({
+        projectName,
+        projectDescription,
         clientName: fullName,
         projectAddress: address,
         date,
@@ -333,6 +348,8 @@ const EstimateForm = () => {
   const handleCancel = () => {
     setFullName("");
     setAddress("");
+    setProjectName("");
+    setProjectDescription("");
     setContactMethod("");
     setPhone("");
     setEmail("");
@@ -393,6 +410,31 @@ const EstimateForm = () => {
                 value={address}
                 onChange={(val) => setAddress(val)}
                 onSelect={(val) => lookupAddress(val)}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={2}>
+            <Grid size={8}>
+              <TextField
+                label="Project Name"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                required
+                fullWidth
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid size={12}>
+              <TextField
+                label="Project Description"
+                value={projectDescription}
+                onChange={(e) => setProjectDescription(e.target.value)}
+                required
+                fullWidth
+                multiline
+                minRows={3}
               />
             </Grid>
           </Grid>
