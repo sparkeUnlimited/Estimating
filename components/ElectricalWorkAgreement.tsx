@@ -53,17 +53,23 @@ export default function ElectricalWorkAgreement({
       <Typography>Client Name: {clientName}</Typography>
       <Typography>Project Address: {projectAddress}</Typography>
       <Typography>Date: {date}</Typography>
-      <Typography sx={{ mt: 2 }}>{agreementText.intro}</Typography>
-
       {agreementText.sections.map((section, idx) => (
         <Fragment key={idx}>
           <Typography variant="h6" sx={{ mt: 2 }}>
             {section.title}
           </Typography>
-          {(
-            Array.isArray(section.body) ? section.body : [section.body]
-          ).map((p, i) => (
-            <Typography key={i}>{replacePlaceholders(p)}</Typography>
+          {section.text && (
+            <Typography sx={{ mt: 1 }}>
+              {replacePlaceholders(section.text)}
+            </Typography>
+          )}
+          {section.subsections?.map((sub, subIdx) => (
+            <Fragment key={subIdx}>
+              <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                {sub.title}
+              </Typography>
+              <Typography>{replacePlaceholders(sub.text)}</Typography>
+            </Fragment>
           ))}
         </Fragment>
       ))}
@@ -71,7 +77,7 @@ export default function ElectricalWorkAgreement({
       <FormControlLabel
         sx={{ mt: 3 }}
         control={<Checkbox required checked={ack} onChange={(e) => setAck(e.target.checked)} />}
-        label={agreementText.acknowledgment}
+        label="I have read and agree to the terms above"
       />
 
       <Typography variant="h6" sx={{ mt: 2 }}>
