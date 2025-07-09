@@ -5,6 +5,8 @@ import SignaturePad from "@/components/SignaturePad";
 import agreementText from "@/data/agreementText.json";
 
 export type ElectricalWorkAgreementData = {
+  projectName: string;
+  projectDescription: string;
   clientName: string;
   projectAddress: string;
   date: string;
@@ -21,6 +23,8 @@ type Props = ElectricalWorkAgreementData & {
 };
 
 export default function ElectricalWorkAgreement({
+  projectName,
+  projectDescription,
   clientName,
   projectAddress,
   date,
@@ -53,6 +57,8 @@ export default function ElectricalWorkAgreement({
       <Typography variant="h4" gutterBottom>
         Electrical Work Agreement
       </Typography>
+      <Typography>Project Name: {projectName}</Typography>
+      <Typography>Project Description: {projectDescription}</Typography>
       <Typography>Client Name: {clientName}</Typography>
       <Typography>Project Address: {projectAddress}</Typography>
       <Typography>Date: {date}</Typography>
