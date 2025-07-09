@@ -122,6 +122,7 @@ const EstimateForm = () => {
   const [email, setEmail] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
+  const [developing] = useState(true);
 
   const [rows, setRows] = useState<EstimateRow[]>([
     {
@@ -388,31 +389,10 @@ const EstimateForm = () => {
         <Stack spacing={3}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h5" fontWeight="bold">
-              Customer Information
+              Project
             </Typography>
-            <Typography variant="h6">{date}</Typography>
+            <Typography variant="h6">Date: {date}</Typography>
           </Box>
-
-          <Grid container spacing={2}>
-            <Grid size={8}>
-              <TextField
-                label="Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid size={12}>
-              <AddressAutocomplete
-                value={address}
-                onChange={(val) => setAddress(val)}
-                onSelect={(val) => lookupAddress(val)}
-              />
-            </Grid>
-          </Grid>
 
           <Grid container spacing={2}>
             <Grid size={8}>
@@ -438,10 +418,64 @@ const EstimateForm = () => {
               />
             </Grid>
           </Grid>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
+            <TextField
+              label="Project Start Date"
+              type="date"
+              value={startDate}
+              required
+              fullWidth
+              onChange={(e) => setStartDate(e.target.value)}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+            />
+
+            <TextField
+              label="Project Completion Date"
+              type="date"
+              value={completionDate}
+              required
+              fullWidth
+              onChange={(e) => setCompletionDate(e.target.value)}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+            />
+          </Stack>
+
+          <Typography variant="h5" fontWeight="bold">
+            Customer Information
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid size={8}>
+              <TextField
+                label="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                fullWidth
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid size={12}>
+              <AddressAutocomplete
+                value={address}
+                onChange={(val) => setAddress(val)}
+                onSelect={(val) => lookupAddress(val)}
+              />
+            </Grid>
+          </Grid>
 
           <Box>
             <Typography fontWeight="medium" gutterBottom>
-              Preferred Contact
+              Preferred Contact Method
             </Typography>
             <RadioGroup
               row
@@ -458,6 +492,7 @@ const EstimateForm = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 onBlur={(e) => setPhone(formatCanadianPhone(e.target.value))}
                 required
+                fullWidth
                 type="tel"
                 slotProps={{
                   htmlInput: {
@@ -484,30 +519,7 @@ const EstimateForm = () => {
                 }}
               />
             </Stack>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
-              <TextField
-                label="Project Start Date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              />
-              <TextField
-                label="Project Completion Date"
-                type="date"
-                value={completionDate}
-                onChange={(e) => setCompletionDate(e.target.value)}
-                slotProps={{
-                  inputLabel: {
-                    shrink: true,
-                  },
-                }}
-              />
-            </Stack>
+
             <Typography variant="h6" fontWeight="bold" my={4}>
               Estimate Items
             </Typography>
@@ -534,13 +546,16 @@ const EstimateForm = () => {
                 onChange={(e) => setTotalFloors(parseInt(e.target.value))}
                 margin="normal"
               /> */}
-              <TextField
-                label="Labour Rate"
-                size="small"
-                type="number"
-                value={labourRate}
-                onChange={(e) => setLabourRate(Number(e.target.value))}
-              />
+              {developing && (
+                <TextField
+                  label="Labour Rate"
+                  size="small"
+                  type="number"
+                  hidden
+                  value={labourRate}
+                  onChange={(e) => setLabourRate(Number(e.target.value))}
+                />
+              )}
             </Stack>
           </Box>
 
