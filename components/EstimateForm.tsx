@@ -153,7 +153,6 @@ const EstimateForm = () => {
     }
   }, [workType]);
 
-
   const allFieldsFilled = fullName && address && contactMethod && phone && email;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
   const customerValid = allFieldsFilled && workType !== "Select Type" && totalFloors;
@@ -312,18 +311,13 @@ const EstimateForm = () => {
     <Paper sx={{ p: 4 }} elevation={4}>
       <Box component="form" onSubmit={handleNext}>
         <Stack spacing={3}>
-          <TextField
-            label="Date"
-            type="date"
-            value={date}
-            InputLabelProps={{ shrink: true }}
-            InputProps={{ readOnly: true }}
-          />
           <Typography variant="h5" fontWeight="bold">
             Customer Information
           </Typography>
+          <Typography variant="h6">{date}</Typography>
+
           <Grid container spacing={2}>
-            <Grid size={12}>
+            <Grid size={8}>
               <TextField
                 label="Full Name"
                 value={fullName}
@@ -776,9 +770,7 @@ const EstimateForm = () => {
                     setDepositAmount(e.target.value);
                   }}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">$</InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}
                   sx={{ mr: 2 }}
                 />
@@ -788,9 +780,7 @@ const EstimateForm = () => {
                   value={balanceDue.toFixed(2)}
                   InputProps={{
                     readOnly: true,
-                    startAdornment: (
-                      <InputAdornment position="start">$</InputAdornment>
-                    ),
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}
                 />
               </Box>
@@ -802,11 +792,7 @@ const EstimateForm = () => {
                 <Button variant="contained" disabled>
                   Back
                 </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleCancel}
-                >
+                <Button variant="outlined" color="secondary" onClick={handleCancel}>
                   Cancel
                 </Button>
                 <Box sx={{ flexGrow: 1 }} />
