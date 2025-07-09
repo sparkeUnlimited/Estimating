@@ -38,6 +38,7 @@ export default function ElectricalWorkAgreement({
 }: Props) {
   const [ack, setAck] = useState(false);
   const [clientSig, setClientSig] = useState("");
+  const [termsConditions, setTermsConditions] = useState("/termsandconditions");
   //const [contractorSig, setContractorSig] = useState("");
 
   useEffect(() => {
@@ -46,6 +47,7 @@ export default function ElectricalWorkAgreement({
 
   const replacePlaceholders = (text: string) =>
     text
+      .replace("{{termsLink}}", termsConditions)
       .replace("{{estimatedTotal}}", estimatedTotal)
       .replace("{{depositAmount}}", depositAmount)
       .replace("{{startDate}}", startDate)
@@ -94,7 +96,7 @@ export default function ElectricalWorkAgreement({
               {replacePlaceholders(section.text)}
             </Typography>
           )}
-          {section.subsections?.map((sub, subIdx) => (
+          {/*  {section.subsections?.map((sub, subIdx) => (
             <Fragment key={subIdx}>
               <Typography fontWeight="bold" sx={{ mt: 1 }}>
                 {sub.title}
@@ -103,7 +105,7 @@ export default function ElectricalWorkAgreement({
                 {replacePlaceholders(sub.text)}
               </Typography>
             </Fragment>
-          ))}
+          ))} */}
         </Fragment>
       ))}
       <Box
