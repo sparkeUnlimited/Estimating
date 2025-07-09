@@ -153,11 +153,6 @@ const EstimateForm = () => {
     }
   }, [workType]);
 
-  useEffect(() => {
-    if (!depositTouched) {
-      setDepositAmount((grandTotal / 2).toFixed(2));
-    }
-  }, [grandTotal, depositTouched]);
 
   const allFieldsFilled = fullName && address && contactMethod && phone && email;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
@@ -214,6 +209,12 @@ const EstimateForm = () => {
   const grandTotal = subtotal - discountAmt;
   const depositNum = parseFloat(depositAmount) || 0;
   const balanceDue = grandTotal - depositNum;
+
+  useEffect(() => {
+    if (!depositTouched) {
+      setDepositAmount((grandTotal / 2).toFixed(2));
+    }
+  }, [grandTotal, depositTouched]);
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
