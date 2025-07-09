@@ -153,6 +153,46 @@ const EstimateForm = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const stored = localStorage.getItem("estimateData");
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored);
+      const c = parsed.customer || {};
+      const e = parsed.estimate || {};
+      setFullName(c.fullName || "");
+      setAddress(c.address || "");
+      setContactMethod(c.contactMethod || "");
+      setPhone(c.phone || "");
+      setEmail(c.email || "");
+      setRows(e.rows || [
+        {
+          name: "",
+          quantity: 0,
+          unitCost: 0,
+          unit: "Each",
+          labourUnit: 0,
+          labourUnitMultiplier: "Each",
+        },
+      ]);
+      setWorkType(e.workType || "Select Type");
+      if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
+      if (typeof e.markup === "number") setMarkup(e.markup);
+      if (typeof e.overhead === "number") setOverhead(e.overhead);
+      if (typeof e.warranty === "number") setWarranty(e.warranty);
+      if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
+      if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
+      setDiscountType(e.discountType || "None");
+      if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
+      setDepositAmount(e.depositAmount || "");
+      setDepositTouched(!!e.depositTouched);
+      setStartDate(e.startDate || "");
+      setCompletionDate(e.completionDate || "");
+    } catch {
+      // ignore corrupt localStorage data
+    }
+  }, []);
+
+  useEffect(() => {
     if (workType === "Residential") {
       setLabourRate(125);
     } else if (workType === "Commercial") {
@@ -251,6 +291,7 @@ const EstimateForm = () => {
         startDate,
         completionDate,
         depositAmount,
+        depositTouched,
         discountType,
         discountValue,
         totals: {
@@ -278,7 +319,7 @@ const EstimateForm = () => {
         date,
         estimatedTotal: grandTotal.toFixed(2),
         depositAmount,
-        balanceDue,
+        balanceDue: balanceDue.toFixed(2),
         startDate,
         completionDate,
       })
