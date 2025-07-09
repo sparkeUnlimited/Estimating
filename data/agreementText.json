@@ -1,113 +1,113 @@
 {
-    "title": "Electrical Work Agreement",
-    "contractor": "Spark‑E Unlimited",
-    "contractorRep": "Ryan Maxwell",
-    "acknowledgment": "I hereby accept this estimate and authorize Spark‑E Unlimited to proceed under the terms described above. I have read, understand, and agree to all terms and conditions set forth in this estimate and acknowledge that this document is an approximation only—not a finalized quote or binding contract. Final pricing will be determined based on approved materials, scope, and actual invoicing.",
-    "sections": [
+  "title": "Electrical Work Agreement",
+  "contractor": "Spark‑E Unlimited",
+  "contractorRep": "Ryan Maxwell",
+  "acknowledgment": "I hereby accept this estimate and authorize Spark‑E Unlimited to proceed under the terms described above. I have read, understand, and agree to all terms and conditions set forth in this estimate and acknowledge that this document is an approximation only—not a finalized quote or binding contract. Final pricing will be determined based on approved materials, scope, and actual invoicing.",
+  "sections": [
     {
-        "title": "Scope of Work",
-        "text": "Contractor will perform electrical services as described in the attached estimate or in writing. Any change orders must be approved in writing by the Client and may incur additional fees."
+      "title": "Scope of Work",
+      "text": "Contractor will perform electrical services as described in the attached estimate or in writing. Any change orders must be approved in writing by the Client and may incur additional fees."
     },
     {
-        "title": "Licensing & Compliance",
-        "text": "Contractor confirms it holds a valid Ontario Electrical Safety Authority (ESA) contractor licence. All work will be performed by licensed personnel in compliance with the Ontario Electrical Code and ESA regulations."
+      "title": "Licensing & Compliance",
+      "text": "Contractor confirms it holds a valid Ontario Electrical Safety Authority (ESA) contractor licence. All work will be performed by licensed personnel in compliance with the Ontario Electrical Code and ESA regulations."
     },
     {
-        "title": "Estimate & Payment Terms",
-        "text": "Estimated Total (ex. tax): $__________\nDeposit: 50% due before work commences ($__________)\nFinal Payment: Due upon project completion\nAccepted payment methods: e‑transfer, cheque, or methods approved by Contractor. Late payment may incur interest or collection fees."
+      "title": "Estimate & Payment Terms",
+      "text": "Estimated Total (ex. tax): ${{estimatedTotal}}\nDeposit: 50% due before work commences: ${{depositAmount}}\nFinal Payment: Due upon project completion : ${{balanceDue}}\nAccepted payment methods: e‑transfer, or methods approved by Contractor. Late payment may incur interest or collection fees."
     },
     {
-        "title": "Schedule",
-        "text": "Start On or Around: _______________________\nEstimated Completion Date: __________________\nSchedule may shift due to weather, supply delays, or unforeseen conditions."
+      "title": "Schedule",
+      "text": "Start On or Around: {{startDate}}\nEstimated Completion Date: {{completionDate}}\nSchedule may shift due to weather, supply delays, or unforeseen conditions."
     },
     {
-        "title": "Materials & Equipment",
-        "text": "Contractor‑supplied materials are included in the attached estimate. Client‑supplied or special‑order materials may result in additional charges."
+      "title": "Materials & Equipment",
+      "text": "Contractor‑supplied materials are included in the attached estimate. Client‑supplied or special‑order materials may result in additional charges."
     },
     {
-        "title": "Permits & Inspections",
-        "text": "Contractor will obtain electrical permits and arrange ESA inspections. Fees are included unless otherwise noted."
+      "title": "Permits & Inspections",
+      "text": "Contractor will obtain electrical permits and arrange ESA inspections. Fees are included unless otherwise noted."
     },
     {
-        "title": "Warranty",
-        "text": "Contractor provides a one‑year workmanship warranty covering installation defects. ESA inspection coordination is included. Warranty does not cover non‑contracted modifications, misuse, system alterations, or third‑party damages."
+      "title": "Warranty",
+      "text": "Contractor provides a one‑year workmanship warranty covering installation defects. ESA inspection coordination is included. Warranty does not cover non‑contracted modifications, misuse, system alterations, or third‑party damages."
     },
     {
-        "title": "Included & Excluded Work",
-        "text": "Included: Only the work, labour, materials, permits, and inspections explicitly listed in the attached itemized estimate are included.\nExcluded: Unless expressly stated in the estimate, the following items are not included: drywall repair or finishing; landscaping; fixture relocation; painting; excavation or structural site work; landscape lighting; HVAC modifications; owner‑supplied fixtures; professional fees (e.g. engineering); work beyond visible site conditions. This list is representative but not exhaustive—any work not listed as included is considered excluded. Additional services require a written change order and may affect cost and schedule."
+      "title": "Included & Excluded Work",
+      "text": "Included: Only the work, labour, materials, permits, and inspections explicitly listed in the attached itemized estimate are included.\nExcluded: Unless expressly stated in the estimate, the following items are not included: drywall repair or finishing; landscaping; fixture relocation; painting; excavation or structural site work; landscape lighting; HVAC modifications; owner‑supplied fixtures; professional fees (e.g. engineering); work beyond visible site conditions. This list is representative but not exhaustive—any work not listed as included is considered excluded. Additional services require a written change order and may affect cost and schedule."
     },
     {
-        "title": "Estimate Terms, Price Disclaimer & Legal Clauses",
-        "subsections": [
+      "title": "Estimate Terms, Price Disclaimer & Legal Clauses",
+      "subsections": [
         {
-            "title": "Material Price Disclaimer & Follow‑Up Quotation",
-            "text": "Material pricing is based on current supplier costs and selected budget‑level materials as of the date above. If the Client selects upgraded materials (e.g. premium pot lights) or supplier pricing increases prior to procurement, a revised quote will be issued, which must be approved in writing before ordering or installation proceeds. Final invoice will reflect actual materials supplied and invoiced."
+          "title": "Material Price Disclaimer & Follow‑Up Quotation",
+          "text": "Material pricing is based on current supplier costs and selected budget‑level materials as of the date above. If the Client selects upgraded materials (e.g. premium pot lights) or supplier pricing increases prior to procurement, a revised quote will be issued, which must be approved in writing before ordering or installation proceeds. Final invoice will reflect actual materials supplied and invoiced."
         },
         {
-            "title": "Estimate Validity Period",
-            "text": "This estimate remains valid for 30 calendar days from the issue date. Contractor may withdraw or revise pricing if work has not commenced within this time."
+          "title": "Estimate Validity Period",
+          "text": "This estimate remains valid for 30 calendar days from the issue date. Contractor may withdraw or revise pricing if work has not commenced within this time."
         },
         {
-            "title": "Notification of Material Price Changes",
-            "text": "Contractor will promptly notify the Client in writing of any supplier cost increases or material specification changes that materially affect pricing. A revised quote must be signed before proceeding."
+          "title": "Notification of Material Price Changes",
+          "text": "Contractor will promptly notify the Client in writing of any supplier cost increases or material specification changes that materially affect pricing. A revised quote must be signed before proceeding."
         },
         {
-            "title": "Client Option on Material Selection",
-            "text": "Client may elect to proceed with the materials and brands listed in the estimate to avoid delay. If material changes are requested later, revised pricing and written Client approval will be required."
+          "title": "Client Option on Material Selection",
+          "text": "Client may elect to proceed with the materials and brands listed in the estimate to avoid delay. If material changes are requested later, revised pricing and written Client approval will be required."
         },
         {
-            "title": "Scope Changes & Additional Work",
-            "text": "Any modifications—including increased quantities, upgraded materials, additional circuits, or hidden site conditions—not covered by this estimate will require a written change order and may impact cost and schedule."
+          "title": "Scope Changes & Additional Work",
+          "text": "Any modifications—including increased quantities, upgraded materials, additional circuits, or hidden site conditions—not covered by this estimate will require a written change order and may impact cost and schedule."
         },
         {
-            "title": "Pricing Adjustment Clause",
-            "text": "If material costs increase significantly (e.g. due to inflation, tariffs, or supplier surcharges) by more than 5%, Contractor reserves the right to adjust pricing proportionately. Any adjustment will be communicated in writing and requires Client approval before proceeding with ordering."
+          "title": "Pricing Adjustment Clause",
+          "text": "If material costs increase significantly (e.g. due to inflation, tariffs, or supplier surcharges) by more than 5%, Contractor reserves the right to adjust pricing proportionately. Any adjustment will be communicated in writing and requires Client approval before proceeding with ordering."
         },
         {
-            "title": "Payment Terms",
-            "text": "A 50% deposit is due prior to work commencement; remaining balance is due on completion. Accepted payment methods: e‑transfer, cheque, or methods approved by Contractor. Outstanding amounts beyond 7 days from invoice may incur a 1.5% monthly late fee."
+          "title": "Payment Terms",
+          "text": "A 50% deposit is due prior to work commencement; remaining balance is due on completion. Accepted payment methods: e‑transfer, cheque, or methods approved by Contractor. Outstanding amounts beyond 7 days from invoice may incur a 1.5% monthly late fee."
         },
         {
-            "title": "Contingency & Site Assumptions",
-            "text": "The estimate assumes conditions visible during inspection. Concealed infrastructure or obstacles may lead to additional charges. Refer to the exclusions list."
+          "title": "Contingency & Site Assumptions",
+          "text": "The estimate assumes conditions visible during inspection. Concealed infrastructure or obstacles may lead to additional charges. Refer to the exclusions list."
         }
-        ]
+      ]
     },
     {
-        "title": "Indemnification & Insurance",
-        "text": "Client and Contractor agree to indemnify and hold harmless the other from claims arising from negligence or breach, except for gross negligence or willful misconduct. Contractor maintains liability insurance and can provide proof upon request."
+      "title": "Indemnification & Insurance",
+      "text": "Client and Contractor agree to indemnify and hold harmless the other from claims arising from negligence or breach, except for gross negligence or willful misconduct. Contractor maintains liability insurance and can provide proof upon request."
     },
     {
-        "title": "Limitation of Liability",
-        "text": "Contractor is not liable for delays, defects, or damage caused by pre‑existing conditions, force majeure, or third parties. Damage due to Client‑supplied materials, site conditions, or delays is excluded."
+      "title": "Limitation of Liability",
+      "text": "Contractor is not liable for delays, defects, or damage caused by pre‑existing conditions, force majeure, or third parties. Damage due to Client‑supplied materials, site conditions, or delays is excluded."
     },
     {
-        "title": "Confidentiality",
-        "text": "Both parties agree to keep the terms of this Agreement and related documents confidential and not disclose them to third parties without consent."
+      "title": "Confidentiality",
+      "text": "Both parties agree to keep the terms of this Agreement and related documents confidential and not disclose them to third parties without consent."
     },
     {
-        "title": "Assignment & Delegation",
-        "text": "Neither party may assign or delegate their rights or obligations except by prior written consent. Contractor may subcontract portions of the work but remains responsible for performance quality."
+      "title": "Assignment & Delegation",
+      "text": "Neither party may assign or delegate their rights or obligations except by prior written consent. Contractor may subcontract portions of the work but remains responsible for performance quality."
     },
     {
-        "title": "Cancellations & Rescheduling",
-        "text": "Cancellation less than 48 hours before the scheduled start forfeits deposit. Rescheduling must be requested at least 48 hours in advance."
+      "title": "Cancellations & Rescheduling",
+      "text": "Cancellation less than 48 hours before the scheduled start forfeits deposit. Rescheduling must be requested at least 48 hours in advance."
     },
     {
-        "title": "Exclusivity & Commitment",
-        "text": "By signing and paying the deposit, the Client agrees not to engage other providers for the same work unless this Agreement is formally canceled in writing."
+      "title": "Exclusivity & Commitment",
+      "text": "By signing and paying the deposit, the Client agrees not to engage other providers for the same work unless this Agreement is formally canceled in writing."
     },
     {
-        "title": "Term & Termination",
-        "text": "This Agreement remains in force until work is complete or terminated in writing. Early termination by Client requires written notice; Contractor may retain deposit and compensation for work performed."
+      "title": "Term & Termination",
+      "text": "This Agreement remains in force until work is complete or terminated in writing. Early termination by Client requires written notice; Contractor may retain deposit and compensation for work performed."
     },
     {
-        "title": "Dispute Resolution & Governing Law",
-        "text": "Disputes will first be addressed through informal negotiations. If unresolved, parties agree to mediation or arbitration in Ontario under Ontario law."
+      "title": "Dispute Resolution & Governing Law",
+      "text": "Disputes will first be addressed through informal negotiations. If unresolved, parties agree to mediation or arbitration in Ontario under Ontario law."
     },
     {
-        "title": "Entire Agreement",
-        "text": "This document—together with the attached estimate and any written change orders—constitutes the entire agreement and supersedes all prior understandings. Amendments must be in writing and signed by both parties."
+      "title": "Entire Agreement",
+      "text": "This document—together with the attached estimate and any written change orders—constitutes the entire agreement and supersedes all prior understandings. Amendments must be in writing and signed by both parties."
     }
-    ]
+  ]
 }

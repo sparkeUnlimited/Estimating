@@ -65,8 +65,17 @@ const lookupAddress = async (
   }
 };
 
-// const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
 const phoneRegex = /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
+// const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
+const formatCanadianPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  const match = digits.match(/^1?([2-9]\d{2})(\d{3})(\d{4})$/);
+  if (!match) return value;
+  const [, area, exchange, line] = match;
+  return `(${area}) ${exchange}-${line}`;
+};
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* const provinces = [
   { code: "AB", name: "Alberta" },
@@ -138,7 +147,9 @@ const EstimateForm = () => {
   const [depositTouched, setDepositTouched] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [completionDate, setCompletionDate] = useState("");
+  const [error, setError] = useState(false);
 
+  const validate = (val: string) => emailRegex.test(val);
   const router = useRouter();
 
   useEffect(() => {
@@ -153,9 +164,10 @@ const EstimateForm = () => {
     }
   }, [workType]);
 
-  const allFieldsFilled = fullName && address && contactMethod && phone && email;
+  //const allFieldsFilled = fullName && address && contactMethod && phone && email && totalFloors;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
-  const customerValid = allFieldsFilled && workType !== "Select Type" && totalFloors;
+  const customerValid =
+    fullName && address && contactMethod && phone && email && workType !== "Select Type";
 
   const addRow = () => {
     setRows((r) => [
@@ -210,10 +222,12 @@ const EstimateForm = () => {
   const balanceDue = grandTotal - depositNum;
 
   useEffect(() => {
-    if (!depositTouched) {
-      setDepositAmount((grandTotal / 2).toFixed(2));
-    }
-  }, [grandTotal, depositTouched]);
+  if (!depositTouched) {
+    const half = grandTotal / 2;
+    const roundedUp = Math.ceil(half);
+    setDepositAmount(roundedUp.toString()); // or String(roundedUp)
+  }
+}, [grandTotal, depositTouched]);
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,6 +278,7 @@ const EstimateForm = () => {
         date,
         estimatedTotal: grandTotal.toFixed(2),
         depositAmount,
+        balanceDue,
         startDate,
         completionDate,
       })
@@ -356,20 +371,32 @@ const EstimateForm = () => {
                 label="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                onBlur={(e) => setPhone(formatCanadianPhone(e.target.value))}
                 required
                 type="tel"
-                inputProps={{
-                  pattern: phoneRegex.source,
-                  title: "Valid Canadian phone number",
+                slotProps={{
+                  htmlInput: {
+                    pattern: phoneRegex.source,
+                    title: "Valid Canadian phone number",
+                    inputMode: "tel",
+                  },
                 }}
               />
               <TextField
                 label="Email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
                 fullWidth
+                error={error}
+                helperText={error ? "Invalid email address" : ""}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError(!validate(e.target.value));
+                }}
+                onBlur={() => {
+                  setError(!validate(email));
+                }}
               />
             </Stack>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
@@ -378,14 +405,22 @@ const EstimateForm = () => {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
               />
               <TextField
                 label="Project Completion Date"
                 type="date"
                 value={completionDate}
                 onChange={(e) => setCompletionDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
               />
             </Stack>
             <Typography variant="h6" fontWeight="bold" my={4}>
@@ -406,14 +441,14 @@ const EstimateForm = () => {
                   <MenuItem value="Commercial">Mixed</MenuItem>
                 </Select>
               </FormControl>
-              <TextField
+              {/* <TextField
                 label="How many floors in the building?"
                 type="number"
                 fullWidth
                 value={totalFloors || ""}
                 onChange={(e) => setTotalFloors(parseInt(e.target.value))}
                 margin="normal"
-              />
+              /> */}
               <TextField
                 label="Labour Rate"
                 size="small"
@@ -424,7 +459,7 @@ const EstimateForm = () => {
             </Stack>
           </Box>
 
-          <HighRiseLabourAdjuster totalFloors={totalFloors} />
+          {/* <HighRiseLabourAdjuster totalFloors={totalFloors} /> */}
 
           {customerValid && (
             <>

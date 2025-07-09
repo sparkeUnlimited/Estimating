@@ -12,6 +12,7 @@ export type ElectricalWorkAgreementData = {
   depositAmount: string;
   startDate: string;
   completionDate: string;
+  balanceDue: string;
 };
 
 type Props = ElectricalWorkAgreementData & {
@@ -25,6 +26,7 @@ export default function ElectricalWorkAgreement({
   date,
   estimatedTotal,
   depositAmount,
+  balanceDue,
   startDate,
   completionDate,
   onReadyChange,
@@ -43,7 +45,8 @@ export default function ElectricalWorkAgreement({
       .replace("{{estimatedTotal}}", estimatedTotal)
       .replace("{{depositAmount}}", depositAmount)
       .replace("{{startDate}}", startDate)
-      .replace("{{completionDate}}", completionDate);
+      .replace("{{completionDate}}", completionDate)
+      .replace("{{balanceDue}}", balanceDue);
 
   return (
     <Box sx={{ backgroundColor: "white", p: 3 }}>
