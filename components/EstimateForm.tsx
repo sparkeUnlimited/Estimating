@@ -26,6 +26,7 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  InputAdornment,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -134,6 +135,7 @@ const EstimateForm = () => {
   const [discountValue, setDiscountValue] = useState(0);
   const [date] = useState(new Date().toISOString().slice(0, 10));
   const [depositAmount, setDepositAmount] = useState("");
+  const [depositTouched, setDepositTouched] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [completionDate, setCompletionDate] = useState("");
 
@@ -150,6 +152,12 @@ const EstimateForm = () => {
       setLabourRate(0); // Default or unrecognized type
     }
   }, [workType]);
+
+  useEffect(() => {
+    if (!depositTouched) {
+      setDepositAmount((grandTotal / 2).toFixed(2));
+    }
+  }, [grandTotal, depositTouched]);
 
   const allFieldsFilled = fullName && address && contactMethod && phone && email;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
@@ -204,6 +212,8 @@ const EstimateForm = () => {
         : 0;
 
   const grandTotal = subtotal - discountAmt;
+  const depositNum = parseFloat(depositAmount) || 0;
+  const balanceDue = grandTotal - depositNum;
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,6 +270,41 @@ const EstimateForm = () => {
     );
 
     router.push("/agreement");
+  };
+
+  const handleCancel = () => {
+    setFullName("");
+    setAddress("");
+    setContactMethod("");
+    setPhone("");
+    setEmail("");
+    setRows([
+      {
+        name: "",
+        quantity: 0,
+        unitCost: 0,
+        unit: "Each",
+        labourUnit: 0,
+        labourUnitMultiplier: "Each",
+      },
+    ]);
+    setWorkType("Select Type");
+    setLabourRate(125);
+    setTotalFloors(0);
+    setMarkup(30);
+    setOverhead(10);
+    setWarranty(3);
+    setEsaFee(0);
+    setHydroFee(0);
+    setDiscountType("None");
+    setDiscountValue(0);
+    setDepositAmount("");
+    setStartDate("");
+    setCompletionDate("");
+    setDepositTouched(false);
+    localStorage.removeItem("estimateData");
+    localStorage.removeItem("agreementData");
+    router.push("/");
   };
 
   return (
@@ -331,12 +376,6 @@ const EstimateForm = () => {
               />
             </Stack>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
-              <TextField
-                label="Deposit Amount"
-                type="number"
-                value={depositAmount}
-                onChange={(e) => setDepositAmount(e.target.value)}
-              />
               <TextField
                 label="Project Start Date"
                 type="date"
@@ -726,6 +765,35 @@ const EstimateForm = () => {
                 </Table>
               </TableContainer>
 
+              <Box textAlign="right" my={2}>
+                <TextField
+                  label="Deposit"
+                  type="number"
+                  value={depositAmount}
+                  onChange={(e) => {
+                    setDepositTouched(true);
+                    setDepositAmount(e.target.value);
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
+                  }}
+                  sx={{ mr: 2 }}
+                />
+                <TextField
+                  label="Balance Due"
+                  type="number"
+                  value={balanceDue.toFixed(2)}
+                  InputProps={{
+                    readOnly: true,
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+
               <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
@@ -736,7 +804,7 @@ const EstimateForm = () => {
                 <Button
                   variant="outlined"
                   color="secondary"
-                  onClick={() => router.push("/")}
+                  onClick={handleCancel}
                 >
                   Cancel
                 </Button>
