@@ -33,8 +33,12 @@
       "text": "Contractor provides a one‑year workmanship warranty covering installation defects. ESA inspection coordination is included. Warranty does not cover non‑contracted modifications, misuse, system alterations, or third‑party damages."
     },
     {
-      "title": "Included & Excluded Work",
-      "text": "Included: Only the work, labour, materials, permits, and inspections explicitly listed in the attached itemized estimate are included.\nExcluded: Unless expressly stated in the estimate, the following items are not included: drywall repair or finishing; landscaping; fixture relocation; painting; excavation or structural site work; landscape lighting; HVAC modifications; owner‑supplied fixtures; professional fees (e.g. engineering); work beyond visible site conditions. This list is representative but not exhaustive—any work not listed as included is considered excluded. Additional services require a written change order and may affect cost and schedule."
+      "title": "Included Work",
+      "text": "Only the work, labour, materials, permits, and inspections explicitly listed in the attached estimate are included."
+    },
+    {
+      "title": "Excluded Work",
+      "text": "Unless expressly stated in the estimate, the following items are not included: drywall repair or finishing; landscaping; fixture relocation; painting; excavation or structural site work; landscape lighting; HVAC modifications; owner‑supplied fixtures; professional fees (e.g. engineering); work beyond visible site conditions. This list is representative but not exhaustive—any work not listed as included is considered excluded. Additional services require a written change order and may affect cost and schedule."
     },
     {
       "title": "Estimate Terms, Price Disclaimer & Legal Clauses",
