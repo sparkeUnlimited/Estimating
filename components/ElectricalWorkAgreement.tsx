@@ -58,7 +58,7 @@ export default function ElectricalWorkAgreement({
       <Typography>Date: {date}</Typography>
       {agreementText.sections.map((section, idx) => (
         <Fragment key={idx}>
-          <Typography variant="h6" sx={{ mt: 2 }}>
+          <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
             {section.title}
           </Typography>
           {section.text && (
@@ -68,7 +68,7 @@ export default function ElectricalWorkAgreement({
           )}
           {section.subsections?.map((sub, subIdx) => (
             <Fragment key={subIdx}>
-              <Typography variant="subtitle1" sx={{ mt: 1 }}>
+              <Typography fontWeight="bold" sx={{ mt: 1 }}>
                 {sub.title}
               </Typography>
               <Typography sx={{ whiteSpace: "pre-line" }}>
