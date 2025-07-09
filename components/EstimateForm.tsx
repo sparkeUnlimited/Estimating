@@ -164,16 +164,18 @@ const EstimateForm = () => {
       setContactMethod(c.contactMethod || "");
       setPhone(c.phone || "");
       setEmail(c.email || "");
-      setRows(e.rows || [
-        {
-          name: "",
-          quantity: 0,
-          unitCost: 0,
-          unit: "Each",
-          labourUnit: 0,
-          labourUnitMultiplier: "Each",
-        },
-      ]);
+      setRows(
+        e.rows || [
+          {
+            name: "",
+            quantity: 0,
+            unitCost: 0,
+            unit: "Each",
+            labourUnit: 0,
+            labourUnitMultiplier: "Each",
+          },
+        ]
+      );
       setWorkType(e.workType || "Select Type");
       if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
       if (typeof e.markup === "number") setMarkup(e.markup);
@@ -262,12 +264,12 @@ const EstimateForm = () => {
   const balanceDue = grandTotal - depositNum;
 
   useEffect(() => {
-  if (!depositTouched) {
-    const half = grandTotal / 2;
-    const roundedUp = Math.ceil(half);
-    setDepositAmount(roundedUp.toString()); // or String(roundedUp)
-  }
-}, [grandTotal, depositTouched]);
+    if (!depositTouched) {
+      const half = grandTotal / 2;
+      const roundedUp = Math.ceil(half);
+      setDepositAmount(roundedUp.toString()); // or String(roundedUp)
+    }
+  }, [grandTotal, depositTouched]);
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -847,8 +849,11 @@ const EstimateForm = () => {
                     setDepositTouched(true);
                     setDepositAmount(e.target.value);
                   }}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  slotProps={{
+                    input: {
+                      readOnly: true,
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    },
                   }}
                   sx={{ mr: 2 }}
                 />
@@ -856,9 +861,11 @@ const EstimateForm = () => {
                   label="Balance Due"
                   type="number"
                   value={balanceDue.toFixed(2)}
-                  InputProps={{
-                    readOnly: true,
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  slotProps={{
+                    input: {
+                      readOnly: true,
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    },
                   }}
                 />
               </Box>

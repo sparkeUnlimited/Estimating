@@ -98,14 +98,21 @@ export default function ElectricalWorkAgreement({
             fullWidth
             value={clientName}
             sx={{ mt: 1 }}
-            InputProps={{ readOnly: true }}
-          />
+            slotProps={{
+              inputLabel: {
+                 shrink: true
+              },
+            }}          />
           <TextField
             label="Date"
             type="date"
             value={date}
             sx={{ mt: 1 }}
-            InputLabelProps={{ shrink: true }}
+            slotProps={{
+              inputLabel: {
+                 shrink: true
+              },
+            }}
             fullWidth
           />
         </Box>
