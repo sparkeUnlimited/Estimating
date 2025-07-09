@@ -38,7 +38,7 @@ export default function ElectricalWorkAgreement({
 }: Props) {
   const [ack, setAck] = useState(false);
   const [clientSig, setClientSig] = useState("");
-  const [contractorSig, setContractorSig] = useState("");
+  //const [contractorSig, setContractorSig] = useState("");
 
   useEffect(() => {
     onReadyChange?.(ack && !!clientSig);
@@ -57,12 +57,33 @@ export default function ElectricalWorkAgreement({
       <Typography variant="h4" gutterBottom>
         Electrical Work Agreement
       </Typography>
-      <Typography>Project Name: {projectName}</Typography>
-      <Typography>Project Description: {projectDescription}</Typography>
-      <Typography>Client Name: {clientName}</Typography>
-      <Typography>Project Address: {projectAddress}</Typography>
-      <Typography>Date: {date}</Typography>
- 
+      <Typography variant="h6" fontWeight={"bold"}>
+        Project Name:{" "}
+      </Typography>
+      <Typography>{projectName}</Typography>
+      <Typography variant="h6" fontWeight={"bold"}>
+        Project Description:{" "}
+      </Typography>
+      <Typography>{projectDescription}</Typography>
+      <Typography sx={{ mt: 4 }}>
+        <Box component="span" fontWeight="fontWeightBold">
+          Client Name:
+        </Box>{" "}
+        {clientName}
+      </Typography>
+      <Typography>
+        <Box component="span" fontWeight="fontWeightBold">
+          Project Address:
+        </Box>{" "}
+        {projectAddress}
+      </Typography>
+      <Typography>
+        <Box component="span" fontWeight="fontWeightBold">
+          Date:
+        </Box>{" "}
+        {date}
+      </Typography>
+
       {agreementText.sections.map((section, idx) => (
         <Fragment key={idx}>
           <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
@@ -85,12 +106,20 @@ export default function ElectricalWorkAgreement({
           ))}
         </Fragment>
       ))}
-
-      <FormControlLabel
-        sx={{ mt: 3 }}
-        control={<Checkbox required checked={ack} onChange={(e) => setAck(e.target.checked)} />}
-        label={agreementText.acknowledgment}
-      />
+      <Box
+        sx={{
+          mt: 3,
+          border: ack ? "none" : "1px solid red",
+          pt: 1,
+          borderRadius: 1,
+          transition: "border 0.3s ease",
+        }}
+      >
+        <FormControlLabel
+          control={<Checkbox required checked={ack} onChange={(e) => setAck(e.target.checked)} />}
+          label={agreementText.acknowledgment}
+        />
+      </Box>
 
       <Typography variant="h6" sx={{ mt: 2 }}>
         Signatures
@@ -111,9 +140,10 @@ export default function ElectricalWorkAgreement({
             sx={{ mt: 1 }}
             slotProps={{
               inputLabel: {
-                 shrink: true
+                shrink: true,
               },
-            }}          />
+            }}
+          />
           <TextField
             label="Date"
             type="date"
@@ -121,9 +151,9 @@ export default function ElectricalWorkAgreement({
             sx={{ mt: 1 }}
             slotProps={{
               inputLabel: {
-                 shrink: true
+                shrink: true,
               },
-              input:{readOnly:true}
+              input: { readOnly: true },
             }}
             fullWidth
           />
