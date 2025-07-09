@@ -311,10 +311,12 @@ const EstimateForm = () => {
     <Paper sx={{ p: 4 }} elevation={4}>
       <Box component="form" onSubmit={handleNext}>
         <Stack spacing={3}>
-          <Typography variant="h5" fontWeight="bold">
-            Customer Information
-          </Typography>
-          <Typography variant="h6">{date}</Typography>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h5" fontWeight="bold">
+              Customer Information
+            </Typography>
+            <Typography variant="h6">{date}</Typography>
+          </Box>
 
           <Grid container spacing={2}>
             <Grid size={8}>
