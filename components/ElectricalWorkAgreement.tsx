@@ -56,6 +56,7 @@ export default function ElectricalWorkAgreement({
       <Typography>Client Name: {clientName}</Typography>
       <Typography>Project Address: {projectAddress}</Typography>
       <Typography>Date: {date}</Typography>
+ 
       {agreementText.sections.map((section, idx) => (
         <Fragment key={idx}>
           <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
@@ -98,7 +99,7 @@ export default function ElectricalWorkAgreement({
             }}
           />
           <TextField
-            label="Name (Printed)"
+            label="Customer Name"
             fullWidth
             value={clientName}
             sx={{ mt: 1 }}
@@ -116,11 +117,12 @@ export default function ElectricalWorkAgreement({
               inputLabel: {
                  shrink: true
               },
+              input:{readOnly:true}
             }}
             fullWidth
           />
         </Box>
-        <Box>
+        {/* <Box>
           <Typography>Contractor Signature:</Typography>
           <SignaturePad onChange={setContractorSig} />
           <Typography sx={{ mt: 1 }}>Ryan Maxwell, Spark-E Unlimited</Typography>
@@ -132,7 +134,7 @@ export default function ElectricalWorkAgreement({
             InputLabelProps={{ shrink: true }}
             fullWidth
           />
-        </Box>
+        </Box> */}
       </Stack>
     </Box>
   );

@@ -322,8 +322,8 @@ const EstimateForm = () => {
         estimatedTotal: grandTotal.toFixed(2),
         depositAmount,
         balanceDue: balanceDue.toFixed(2),
-        startDate,
-        completionDate,
+        startDate: startDate.toString(),
+        completionDate: completionDate.toString(),
       })
     );
 
