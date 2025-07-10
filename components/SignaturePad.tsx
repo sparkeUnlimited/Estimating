@@ -1,6 +1,6 @@
 "use client";
-import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
-import { useRef, useEffect, useState } from "react";
+import { Box, Button } from "@mui/material";
+import { useRef } from "react";
 
 type Props = {
   onChange?: (dataUrl: string) => void;
@@ -10,18 +10,8 @@ export default function SignaturePad({ onChange }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-  // Responsive width state
-  const [canvasWidth, setCanvasWidth] = useState(400);
-  const canvasHeight = 200;
-
-  useEffect(() => {
-    // Set width based on screen size
-    const newWidth = isMobile ? window.innerWidth * 0.9 : 600;
-    setCanvasWidth(newWidth);
-  }, [isMobile]);
+  const canvasWidth = 300;
+  const canvasHeight = 150;
 
   const getContext = () => canvasRef.current?.getContext("2d") || null;
 
@@ -76,13 +66,7 @@ export default function SignaturePad({ onChange }: Props) {
         ref={canvasRef}
         width={canvasWidth}
         height={canvasHeight}
-        style={{
-          width: "100%",
-          height: canvasHeight,
-          border: "1px solid #000",
-          touchAction: "none",
-          display: "block",
-        }}
+        style={{ border: "1px solid #000", touchAction: "none" }}
         onPointerDown={start}
         onPointerMove={draw}
         onPointerUp={end}
