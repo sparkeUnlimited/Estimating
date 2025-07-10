@@ -20,34 +20,10 @@ export type ElectricalWorkAgreementData = {
   projectAddress: string;
   date: string;
   estimatedTotal: string;
-  contactMethod: string;
-  phone: string;
-  email: string;
   depositAmount: string;
   startDate: string;
   completionDate: string;
   balanceDue: string;
-  workType: string;
-  labourRate: string;
-  rows: string;
-  markup: string;
-  overhead: string;
-  esaFee: string;
-  hydroFee: string;
-  depositTouched: string;
-  discountType: string;
-  discountValue: string;
-  materialSum: string;
-  labourExtensionSum: string;
-  totalLabourCost: string;
-  totalMaterial: string;
-  baseCost: string;
-  markupAmt: string;
-  overheadAmt: string;
-  cost: string;
-  warrantyAmt: string;
-  discountAmt: string;
-  grandTotal: string;
 };
 
 type Props = ElectricalWorkAgreementData & {
@@ -67,27 +43,7 @@ export default function ElectricalWorkAgreement({
   balanceDue,
   startDate,
   completionDate,
-  workType,
-  labourRate,
-  rows,
-  markup,
-  overhead,
-  esaFee,
-  hydroFee,
-  depositTouched,
-  discountType,
-  discountValue,
-  materialSum,
-  labourExtensionSum,
-  totalLabourCost,
-  totalMaterial,
-  baseCost,
-  markupAmt,
-  overheadAmt,
-  cost,
-  warrantyAmt,
-  discountAmt,
-  grandTotal,
+
   onReadyChange,
   onSignature,
   actions,
@@ -164,16 +120,6 @@ export default function ElectricalWorkAgreement({
                 {replaceTextPlaceholders(section.text)}
               </Typography>
             )}
-            {/*  {section.subsections?.map((sub, subIdx) => (
-            <Fragment key={subIdx}>
-              <Typography fontWeight="bold" sx={{ mt: 1 }}>
-                {sub.title}
-              </Typography>
-              <Typography sx={{ whiteSpace: "pre-line" }}>
-                {replaceTextPlaceholders(sub.text)}
-              </Typography>
-            </Fragment>
-          ))} */}
           </Fragment>
         ))}
         <Box
@@ -228,19 +174,6 @@ export default function ElectricalWorkAgreement({
               fullWidth
             />
           </Box>
-          {/* <Box>
-          <Typography>Contractor Signature:</Typography>
-          <SignaturePad onChange={setContractorSig} />
-          <Typography sx={{ mt: 1 }}>Ryan Maxwell, Spark-E Unlimited</Typography>
-          <TextField
-            label="Date"
-            type="date"
-            value={date}
-            sx={{ mt: 1 }}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-        </Box> */}
         </Stack>
         {actions}
       </Box>
