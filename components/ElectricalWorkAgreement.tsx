@@ -1,5 +1,13 @@
 "use client";
-import { Box, Typography, FormControlLabel, Checkbox, Stack, TextField, Paper } from "@mui/material";
+import {
+  Box,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+  Stack,
+  TextField,
+  Paper,
+} from "@mui/material";
 import { useState, useEffect, Fragment, ReactNode } from "react";
 import Link from "next/link";
 import SignaturePad from "@/components/SignaturePad";
@@ -12,10 +20,34 @@ export type ElectricalWorkAgreementData = {
   projectAddress: string;
   date: string;
   estimatedTotal: string;
+  contactMethod: string;
+  phone: string;
+  email: string;
   depositAmount: string;
   startDate: string;
   completionDate: string;
   balanceDue: string;
+  workType: string;
+  labourRate: string;
+  rows: string;
+  markup: string;
+  overhead: string;
+  esaFee: string;
+  hydroFee: string;
+  depositTouched: string;
+  discountType: string;
+  discountValue: string;
+  materialSum: string;
+  labourExtensionSum: string;
+  totalLabourCost: string;
+  totalMaterial: string;
+  baseCost: string;
+  markupAmt: string;
+  overheadAmt: string;
+  cost: string;
+  warrantyAmt: string;
+  discountAmt: string;
+  grandTotal: string;
 };
 
 type Props = ElectricalWorkAgreementData & {
@@ -35,6 +67,27 @@ export default function ElectricalWorkAgreement({
   balanceDue,
   startDate,
   completionDate,
+  workType,
+  labourRate,
+  rows,
+  markup,
+  overhead,
+  esaFee,
+  hydroFee,
+  depositTouched,
+  discountType,
+  discountValue,
+  materialSum,
+  labourExtensionSum,
+  totalLabourCost,
+  totalMaterial,
+  baseCost,
+  markupAmt,
+  overheadAmt,
+  cost,
+  warrantyAmt,
+  discountAmt,
+  grandTotal,
   onReadyChange,
   onSignature,
   actions,
@@ -71,47 +124,47 @@ export default function ElectricalWorkAgreement({
   return (
     <Paper sx={{ p: 4 }} elevation={4}>
       <Box>
-      <Typography variant="h4" gutterBottom>
-        Electrical Work Agreement
-      </Typography>
-      <Typography variant="h6" fontWeight={"bold"}>
-        Project Name:{" "}
-      </Typography>
-      <Typography>{projectName}</Typography>
-      <Typography variant="h6" fontWeight={"bold"}>
-        Project Description:{" "}
-      </Typography>
-      <Typography>{projectDescription}</Typography>
-      <Typography sx={{ mt: 4 }}>
-        <Box component="span" fontWeight="fontWeightBold">
-          Client Name:
-        </Box>{" "}
-        {clientName}
-      </Typography>
-      <Typography>
-        <Box component="span" fontWeight="fontWeightBold">
-          Project Address:
-        </Box>{" "}
-        {projectAddress}
-      </Typography>
-      <Typography>
-        <Box component="span" fontWeight="fontWeightBold">
-          Date:
-        </Box>{" "}
-        {date}
-      </Typography>
+        <Typography variant="h4" gutterBottom>
+          Electrical Work Agreement
+        </Typography>
+        <Typography variant="h6" fontWeight={"bold"}>
+          Project Name:{" "}
+        </Typography>
+        <Typography>{projectName}</Typography>
+        <Typography variant="h6" fontWeight={"bold"}>
+          Project Description:{" "}
+        </Typography>
+        <Typography>{projectDescription}</Typography>
+        <Typography sx={{ mt: 4 }}>
+          <Box component="span" fontWeight="fontWeightBold">
+            Client Name:
+          </Box>{" "}
+          {clientName}
+        </Typography>
+        <Typography>
+          <Box component="span" fontWeight="fontWeightBold">
+            Project Address:
+          </Box>{" "}
+          {projectAddress}
+        </Typography>
+        <Typography>
+          <Box component="span" fontWeight="fontWeightBold">
+            Date:
+          </Box>{" "}
+          {date}
+        </Typography>
 
-      {agreementText.sections.map((section, idx) => (
-        <Fragment key={idx}>
-          <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
-            {section.title}
-          </Typography>
-          {section.text && (
-            <Typography sx={{ mt: 1, whiteSpace: "pre-line" }}>
-              {replaceTextPlaceholders(section.text)}
+        {agreementText.sections.map((section, idx) => (
+          <Fragment key={idx}>
+            <Typography variant="h6" fontWeight="bold" sx={{ mt: 2 }}>
+              {section.title}
             </Typography>
-          )}
-          {/*  {section.subsections?.map((sub, subIdx) => (
+            {section.text && (
+              <Typography sx={{ mt: 1, whiteSpace: "pre-line" }}>
+                {replaceTextPlaceholders(section.text)}
+              </Typography>
+            )}
+            {/*  {section.subsections?.map((sub, subIdx) => (
             <Fragment key={subIdx}>
               <Typography fontWeight="bold" sx={{ mt: 1 }}>
                 {sub.title}
@@ -121,61 +174,61 @@ export default function ElectricalWorkAgreement({
               </Typography>
             </Fragment>
           ))} */}
-        </Fragment>
-      ))}
-      <Box
-        sx={{
-          mt: 3,
-          border: ack ? "none" : "1px solid red",
-          pt: 1,
-          borderRadius: 1,
-          transition: "border 0.3s ease",
-        }}
-      >
-        <FormControlLabel
-          control={<Checkbox required checked={ack} onChange={(e) => setAck(e.target.checked)} />}
-          label={renderAcknowledgment(agreementText.acknowledgment)}
-        />
-      </Box>
-
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        Signatures
-      </Typography>
-      <Stack spacing={3} mt={2}>
-        <Box>
-          <Typography>Client Signature:</Typography>
-          <SignaturePad
-            onChange={(sig) => {
-              setClientSig(sig);
-              onSignature?.(sig);
-            }}
-          />
-          <TextField
-            label="Customer Name"
-            fullWidth
-            value={clientName}
-            sx={{ mt: 1 }}
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-            }}
-          />
-          <TextField
-            label="Date"
-            type="date"
-            value={date}
-            sx={{ mt: 1 }}
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-              input: { readOnly: true },
-            }}
-            fullWidth
+          </Fragment>
+        ))}
+        <Box
+          sx={{
+            mt: 3,
+            border: ack ? "none" : "1px solid red",
+            pt: 1,
+            borderRadius: 1,
+            transition: "border 0.3s ease",
+          }}
+        >
+          <FormControlLabel
+            control={<Checkbox required checked={ack} onChange={(e) => setAck(e.target.checked)} />}
+            label={renderAcknowledgment(agreementText.acknowledgment)}
           />
         </Box>
-        {/* <Box>
+
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Signatures
+        </Typography>
+        <Stack spacing={3} mt={2}>
+          <Box>
+            <Typography>Client Signature:</Typography>
+            <SignaturePad
+              onChange={(sig) => {
+                setClientSig(sig);
+                onSignature?.(sig);
+              }}
+            />
+            <TextField
+              label="Customer Name"
+              fullWidth
+              value={clientName}
+              sx={{ mt: 1 }}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+            />
+            <TextField
+              label="Date"
+              type="date"
+              value={date}
+              sx={{ mt: 1 }}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+                input: { readOnly: true },
+              }}
+              fullWidth
+            />
+          </Box>
+          {/* <Box>
           <Typography>Contractor Signature:</Typography>
           <SignaturePad onChange={setContractorSig} />
           <Typography sx={{ mt: 1 }}>Ryan Maxwell, Spark-E Unlimited</Typography>
@@ -188,8 +241,8 @@ export default function ElectricalWorkAgreement({
             fullWidth
           />
         </Box> */}
-      </Stack>
-      {actions}
+        </Stack>
+        {actions}
       </Box>
     </Paper>
   );
