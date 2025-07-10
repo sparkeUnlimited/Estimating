@@ -56,7 +56,7 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
 
       {/* Foreground Content */}
       <Container
-        maxWidth="xl"
+        maxWidth="lg"
         sx={{
           position: "relative",
           display: "flex",
