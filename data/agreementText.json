@@ -1,0 +1,39 @@
+{
+  "title": "Electrical Work Agreement",
+  "contractor": "Spark‑E Unlimited",
+  "contractorRep": "Ryan Maxwell",
+  "acknowledgment": "I hereby accept this estimate and authorize Spark‑E Unlimited to proceed under the terms described above. I have read, understand, and agree to all {{termsLink}} and acknowledge that this document is an approximation only—not a finalized quote or binding contract. Final pricing will be determined based on approved materials, scope, and actual invoicing.",
+  "sections": [
+    {
+      "title": "Scope of Work",
+      "text": "Contractor will perform electrical services as described in the attached estimate or in writing. Any change orders must be approved in writing by the Client and may incur additional fees."
+    },
+    
+    {
+      "title": "Estimate & Payment Terms",
+      "text": "Estimated Total (ex. tax): ${{estimatedTotal}}\nDeposit: 50% due before work commences: ${{depositAmount}}\nFinal Payment: Due upon project completion : ${{balanceDue}}\nAccepted payment methods: e‑transfer, or methods approved by Contractor. Late payment may incur interest or collection fees."
+    },
+    {
+      "title": "Schedule",
+      "text": "Start On or Around: {{startDate}}\nEstimated Completion Date: {{completionDate}}\nSchedule may shift due to weather, supply delays, or unforeseen conditions."
+    },
+    {
+      "title": "Materials & Equipment",
+      "text": "Contractor‑supplied materials are included in the attached estimate. Client‑supplied or special‑order materials may result in additional charges."
+    },
+    {
+      "title": "Permits & Inspections",
+      "text": "Contractor will obtain electrical permits and arrange ESA inspections. Fees are included unless otherwise noted."
+    },
+    {
+      "title": "Warranty",
+      "text": "Contractor provides a one‑year workmanship warranty covering installation defects. ESA inspection coordination is included. Warranty does not cover non‑contracted modifications, misuse, system alterations, or third‑party damages."
+    },
+    
+    
+    {
+      "title": "Entire Agreement",
+      "text": "This document—together with the attached estimate and any written change orders—constitutes the entire agreement and supersedes all prior understandings. Amendments must be in writing and signed by both parties."
+    }
+  ]
+}

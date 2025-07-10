@@ -1,6 +1,6 @@
 import { Box, Container } from "@mui/material";
 import Head from "next/head";
-import Nav from "@/components/Nav"; // make sure this exists or replace with your nav
+import Nav from "@/components/Nav";
 import { ReactNode } from "react";
 
 type LayoutProps = {
@@ -16,23 +16,22 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      {/* Black Overlay */}
+      {/* Background */}
       <Box
         sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
           backgroundColor: "black",
           background: "radial-gradient(circle, rgba(2, 0, 10, 0.8) 0%, black 100%)",
-          position: "absolute",
-          zIndex: 2,
-          width: "100%",
-          height: "100%",
-          top: 0,
+          zIndex: -2,
         }}
-        className="main"
       >
-        {/* Radial Gradient Background */}
+        {/* Radial Gradient Layer */}
         <Box
           sx={{
-            zIndex: 3,
             width: "100%",
             height: "100%",
             maxWidth: "640px",
@@ -48,18 +47,18 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
             `,
             filter: "blur(100px) saturate(150%)",
             top: "80px",
+            left: 0,
             opacity: 0.15,
+            zIndex: -1,
           }}
-          className="gradient"
         />
       </Box>
 
-      {/* Main Content Container */}
+      {/* Foreground Content */}
       <Container
         maxWidth="lg"
         sx={{
           position: "relative",
-          zIndex: 10,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -67,6 +66,7 @@ const Layout = ({ title = "Estimating Tool", children }: LayoutProps) => {
           px: { xs: 2, sm: 6 },
           mx: "auto",
           minHeight: "100vh",
+          zIndex: 1,
         }}
       >
         <Nav />

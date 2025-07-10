@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -25,11 +26,11 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  InputAdornment,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { sendEstimateDetailsLambda } from "@/lib/api";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import HighRiseLabourAdjuster from "@/components/HighRiseLabourAdjuster";
 
@@ -64,8 +65,17 @@ const lookupAddress = async (
   }
 };
 
-// const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
 const phoneRegex = /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
+// const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
+const formatCanadianPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  const match = digits.match(/^1?([2-9]\d{2})(\d{3})(\d{4})$/);
+  if (!match) return value;
+  const [, area, exchange, line] = match;
+  return `(${area}) ${exchange}-${line}`;
+};
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* const provinces = [
   { code: "AB", name: "Alberta" },
@@ -110,6 +120,9 @@ const EstimateForm = () => {
   const [contactMethod, setContactMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [developing] = useState(true);
 
   const [rows, setRows] = useState<EstimateRow[]>([
     {
@@ -132,6 +145,59 @@ const EstimateForm = () => {
   const [hydroFee, setHydroFee] = useState(0);
   const [discountType, setDiscountType] = useState("None");
   const [discountValue, setDiscountValue] = useState(0);
+  const [date] = useState(new Date().toISOString().slice(0, 10));
+  const [depositAmount, setDepositAmount] = useState("");
+  const [depositTouched, setDepositTouched] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [completionDate, setCompletionDate] = useState("");
+  const [error, setError] = useState(false);
+
+  const validate = (val: string) => emailRegex.test(val);
+  const router = useRouter();
+
+  useEffect(() => {
+    const stored = localStorage.getItem("estimateData");
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored);
+      const c = parsed.customer || {};
+      const e = parsed.estimate || {};
+      setFullName(c.fullName || "");
+      setAddress(c.address || "");
+      setContactMethod(c.contactMethod || "");
+      setPhone(c.phone || "");
+      setEmail(c.email || "");
+      setProjectName(c.projectName || "");
+      setProjectDescription(c.projectDescription || "");
+      setRows(
+        e.rows || [
+          {
+            name: "",
+            quantity: 0,
+            unitCost: 0,
+            unit: "Each",
+            labourUnit: 0,
+            labourUnitMultiplier: "Each",
+          },
+        ]
+      );
+      setWorkType(e.workType || "Select Type");
+      if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
+      if (typeof e.markup === "number") setMarkup(e.markup);
+      if (typeof e.overhead === "number") setOverhead(e.overhead);
+      if (typeof e.warranty === "number") setWarranty(e.warranty);
+      if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
+      if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
+      setDiscountType(e.discountType || "None");
+      if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
+      setDepositAmount(e.depositAmount || "");
+      setDepositTouched(!!e.depositTouched);
+      setStartDate(e.startDate || "");
+      setCompletionDate(e.completionDate || "");
+    } catch {
+      // ignore corrupt localStorage data
+    }
+  }, []);
 
   useEffect(() => {
     if (workType === "Residential") {
@@ -145,9 +211,17 @@ const EstimateForm = () => {
     }
   }, [workType]);
 
-  const allFieldsFilled = fullName && address && contactMethod && phone && email;
+  //const allFieldsFilled = fullName && address && contactMethod && phone && email && totalFloors;
   // fullName && address && city && province && postalCode && contactMethod && phone && email;
-  const customerValid = allFieldsFilled && workType !== "Select Type" && totalFloors;
+  const customerValid =
+    fullName &&
+    address &&
+    projectName &&
+    projectDescription &&
+    contactMethod &&
+    phone &&
+    email &&
+    workType !== "Select Type";
 
   const addRow = () => {
     setRows((r) => [
@@ -198,13 +272,26 @@ const EstimateForm = () => {
         : 0;
 
   const grandTotal = subtotal - discountAmt;
+  const depositNum = parseFloat(depositAmount) || 0;
+  const balanceDue = grandTotal - depositNum;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!depositTouched) {
+      const half = grandTotal / 2;
+      const roundedUp = Math.ceil(half);
+      setDepositAmount(roundedUp.toString()); // or String(roundedUp)
+    }
+  }, [grandTotal, depositTouched]);
+
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
     const data = {
+      date,
       customer: {
         fullName,
         address,
+        projectName,
+        projectDescription,
         contactMethod,
         phone,
         email,
@@ -217,6 +304,10 @@ const EstimateForm = () => {
         overhead,
         esaFee,
         hydroFee,
+        startDate,
+        completionDate,
+        depositAmount,
+        depositTouched,
         discountType,
         discountValue,
         totals: {
@@ -235,19 +326,134 @@ const EstimateForm = () => {
       },
     };
 
-    const pdfBlob = new Blob([], { type: "application/pdf" });
-    await sendEstimateDetailsLambda(data, pdfBlob);
+    localStorage.setItem("estimateData", JSON.stringify(data));
+    localStorage.setItem(
+      "agreementData",
+      JSON.stringify({
+        projectName,
+        projectDescription,
+        clientName: fullName,
+        projectAddress: address,
+        date,
+        estimatedTotal: grandTotal.toFixed(2),
+        depositAmount,
+        balanceDue: balanceDue.toFixed(2),
+        startDate: startDate.toString(),
+        completionDate: completionDate.toString(),
+      })
+    );
+
+    router.push("/agreement");
+  };
+
+  const handleCancel = () => {
+    setFullName("");
+    setAddress("");
+    setProjectName("");
+    setProjectDescription("");
+    setContactMethod("");
+    setPhone("");
+    setEmail("");
+    setRows([
+      {
+        name: "",
+        quantity: 0,
+        unitCost: 0,
+        unit: "Each",
+        labourUnit: 0,
+        labourUnitMultiplier: "Each",
+      },
+    ]);
+    setWorkType("Select Type");
+    setLabourRate(125);
+    setTotalFloors(0);
+    setMarkup(30);
+    setOverhead(10);
+    setWarranty(3);
+    setEsaFee(0);
+    setHydroFee(0);
+    setDiscountType("None");
+    setDiscountValue(0);
+    setDepositAmount("");
+    setStartDate("");
+    setCompletionDate("");
+    setDepositTouched(false);
+    localStorage.removeItem("estimateData");
+    localStorage.removeItem("agreementData");
+    router.push("/");
   };
 
   return (
     <Paper sx={{ p: 4 }} elevation={4}>
-      <Box component="form" onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleNext}>
         <Stack spacing={3}>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h5" fontWeight="bold">
+              Project
+            </Typography>
+            <Typography variant="h6">Date: {date}</Typography>
+          </Box>
+
+          <Grid container spacing={2}>
+            <Grid size={8}>
+              <TextField
+                label="Project Name"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                required
+                fullWidth
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid size={12}>
+              <TextField
+                label="Project Description"
+                value={projectDescription}
+                onChange={(e) => setProjectDescription(e.target.value)}
+                required
+                fullWidth
+                multiline
+                minRows={3}
+              />
+            </Grid>
+          </Grid>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
+            <TextField
+              label="Project Start Date"
+              type="date"
+              value={startDate}
+              required
+              fullWidth
+              onChange={(e) => setStartDate(e.target.value)}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+            />
+
+            <TextField
+              label="Project Completion Date"
+              type="date"
+              value={completionDate}
+              required
+              fullWidth
+              onChange={(e) => setCompletionDate(e.target.value)}
+              slotProps={{
+                inputLabel: {
+                  shrink: true,
+                },
+              }}
+            />
+          </Stack>
+
           <Typography variant="h5" fontWeight="bold">
             Customer Information
           </Typography>
+
           <Grid container spacing={2}>
-            <Grid size={12}>
+            <Grid size={8}>
               <TextField
                 label="Full Name"
                 value={fullName}
@@ -269,7 +475,7 @@ const EstimateForm = () => {
 
           <Box>
             <Typography fontWeight="medium" gutterBottom>
-              Preferred Contact
+              Preferred Contact Method
             </Typography>
             <RadioGroup
               row
@@ -284,22 +490,36 @@ const EstimateForm = () => {
                 label="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                onBlur={(e) => setPhone(formatCanadianPhone(e.target.value))}
                 required
+                fullWidth
                 type="tel"
-                inputProps={{
-                  pattern: phoneRegex.source,
-                  title: "Valid Canadian phone number",
+                slotProps={{
+                  htmlInput: {
+                    pattern: phoneRegex.source,
+                    title: "Valid Canadian phone number",
+                    inputMode: "tel",
+                  },
                 }}
               />
               <TextField
                 label="Email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
                 fullWidth
+                error={error}
+                helperText={error ? "Invalid email address" : ""}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError(!validate(e.target.value));
+                }}
+                onBlur={() => {
+                  setError(!validate(email));
+                }}
               />
             </Stack>
+
             <Typography variant="h6" fontWeight="bold" my={4}>
               Estimate Items
             </Typography>
@@ -318,25 +538,28 @@ const EstimateForm = () => {
                   <MenuItem value="Commercial">Mixed</MenuItem>
                 </Select>
               </FormControl>
-              <TextField
+              {/* <TextField
                 label="How many floors in the building?"
                 type="number"
                 fullWidth
                 value={totalFloors || ""}
                 onChange={(e) => setTotalFloors(parseInt(e.target.value))}
                 margin="normal"
-              />
-              <TextField
-                label="Labour Rate"
-                size="small"
-                type="number"
-                value={labourRate}
-                onChange={(e) => setLabourRate(Number(e.target.value))}
-              />
+              /> */}
+              {developing && (
+                <TextField
+                  label="Labour Rate"
+                  size="small"
+                  type="number"
+                  hidden
+                  value={labourRate}
+                  onChange={(e) => setLabourRate(Number(e.target.value))}
+                />
+              )}
             </Stack>
           </Box>
 
-          <HighRiseLabourAdjuster totalFloors={totalFloors} />
+          {/* <HighRiseLabourAdjuster totalFloors={totalFloors} /> */}
 
           {customerValid && (
             <>
@@ -674,12 +897,51 @@ const EstimateForm = () => {
                 </Table>
               </TableContainer>
 
+              <Box textAlign="right" my={2}>
+                <TextField
+                  label="Deposit"
+                  type="number"
+                  value={depositAmount}
+                  onChange={(e) => {
+                    setDepositTouched(true);
+                    setDepositAmount(e.target.value);
+                  }}
+                  slotProps={{
+                    input: {
+                      readOnly: true,
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    },
+                  }}
+                  sx={{ mr: 2 }}
+                />
+                <TextField
+                  label="Balance Due"
+                  type="number"
+                  value={balanceDue.toFixed(2)}
+                  slotProps={{
+                    input: {
+                      readOnly: true,
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    },
+                  }}
+                />
+              </Box>
+
               <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
-              <Button type="submit" variant="contained">
-                Submit Estimate
-              </Button>
+              <Stack direction="row" spacing={2} mt={2}>
+                <Button variant="contained" disabled>
+                  Back
+                </Button>
+                <Button variant="outlined" color="secondary" onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Box sx={{ flexGrow: 1 }} />
+                <Button type="submit" variant="contained" disabled={!customerValid}>
+                  Next
+                </Button>
+              </Stack>
             </>
           )}
         </Stack>
