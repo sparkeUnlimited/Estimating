@@ -1,5 +1,5 @@
 "use client";
-import { Box, Typography, FormControlLabel, Checkbox, Stack, TextField } from "@mui/material";
+import { Box, Typography, FormControlLabel, Checkbox, Stack, TextField, Paper } from "@mui/material";
 import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
 import SignaturePad from "@/components/SignaturePad";
@@ -67,7 +67,8 @@ export default function ElectricalWorkAgreement({
   };
 
   return (
-    <Box sx={{ backgroundColor: "white", p: 3 }}>
+    <Paper sx={{ p: 4 }} elevation={4}>
+      <Box>
       <Typography variant="h4" gutterBottom>
         Electrical Work Agreement
       </Typography>
@@ -172,20 +173,8 @@ export default function ElectricalWorkAgreement({
             fullWidth
           />
         </Box>
-        {/* <Box>
-          <Typography>Contractor Signature:</Typography>
-          <SignaturePad onChange={setContractorSig} />
-          <Typography sx={{ mt: 1 }}>Ryan Maxwell, Spark-E Unlimited</Typography>
-          <TextField
-            label="Date"
-            type="date"
-            value={date}
-            sx={{ mt: 1 }}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-        </Box> */}
       </Stack>
-    </Box>
+      </Box>
+    </Paper>
   );
 }

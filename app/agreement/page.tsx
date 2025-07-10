@@ -45,6 +45,7 @@ export default function AgreementPage() {
 
   return (
     <Layout title="Agreement">
+      
       <ElectricalWorkAgreement
         {...data}
         onReadyChange={setReady}
