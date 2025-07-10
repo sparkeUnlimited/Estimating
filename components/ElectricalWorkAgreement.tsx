@@ -1,6 +1,7 @@
 "use client";
 import { Box, Typography, FormControlLabel, Checkbox, Stack, TextField } from "@mui/material";
 import { useState, useEffect, Fragment } from "react";
+import Link from "next/link";
 import SignaturePad from "@/components/SignaturePad";
 import agreementText from "@/data/agreementText.json";
 
@@ -38,21 +39,32 @@ export default function ElectricalWorkAgreement({
 }: Props) {
   const [ack, setAck] = useState(false);
   const [clientSig, setClientSig] = useState("");
-  const [termsConditions, setTermsConditions] = useState("/termsandconditions");
+  const termsConditionsUrl = "/termsandconditions";
   //const [contractorSig, setContractorSig] = useState("");
 
   useEffect(() => {
     onReadyChange?.(ack && !!clientSig);
   }, [ack, clientSig, onReadyChange]);
 
-  const replacePlaceholders = (text: string) =>
+  const replaceTextPlaceholders = (text: string) =>
     text
-      .replace("{{termsLink}}", termsConditions)
       .replace("{{estimatedTotal}}", estimatedTotal)
       .replace("{{depositAmount}}", depositAmount)
       .replace("{{startDate}}", startDate)
       .replace("{{completionDate}}", completionDate)
       .replace("{{balanceDue}}", balanceDue);
+
+  const renderAcknowledgment = (text: string) => {
+    const replaced = replaceTextPlaceholders(text);
+    const parts = replaced.split("{{termsLink}}");
+    return (
+      <>
+        {parts[0]}
+        <Link href={termsConditionsUrl}>Terms and Conditions</Link>
+        {parts[1]}
+      </>
+    );
+  };
 
   return (
     <Box sx={{ backgroundColor: "white", p: 3 }}>
@@ -93,7 +105,7 @@ export default function ElectricalWorkAgreement({
           </Typography>
           {section.text && (
             <Typography sx={{ mt: 1, whiteSpace: "pre-line" }}>
-              {replacePlaceholders(section.text)}
+              {replaceTextPlaceholders(section.text)}
             </Typography>
           )}
           {/*  {section.subsections?.map((sub, subIdx) => (
@@ -102,7 +114,7 @@ export default function ElectricalWorkAgreement({
                 {sub.title}
               </Typography>
               <Typography sx={{ whiteSpace: "pre-line" }}>
-                {replacePlaceholders(sub.text)}
+                {replaceTextPlaceholders(sub.text)}
               </Typography>
             </Fragment>
           ))} */}
@@ -119,7 +131,7 @@ export default function ElectricalWorkAgreement({
       >
         <FormControlLabel
           control={<Checkbox required checked={ack} onChange={(e) => setAck(e.target.checked)} />}
-          label={agreementText.acknowledgment}
+          label={renderAcknowledgment(agreementText.acknowledgment)}
         />
       </Box>
 
