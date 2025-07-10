@@ -173,6 +173,19 @@ export default function ElectricalWorkAgreement({
             fullWidth
           />
         </Box>
+        {/* <Box>
+          <Typography>Contractor Signature:</Typography>
+          <SignaturePad onChange={setContractorSig} />
+          <Typography sx={{ mt: 1 }}>Ryan Maxwell, Spark-E Unlimited</Typography>
+          <TextField
+            label="Date"
+            type="date"
+            value={date}
+            sx={{ mt: 1 }}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+          />
+        </Box> */}
       </Stack>
       </Box>
     </Paper>
