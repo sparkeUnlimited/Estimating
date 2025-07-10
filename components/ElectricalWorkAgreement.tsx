@@ -1,6 +1,6 @@
 "use client";
 import { Box, Typography, FormControlLabel, Checkbox, Stack, TextField, Paper } from "@mui/material";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, ReactNode } from "react";
 import Link from "next/link";
 import SignaturePad from "@/components/SignaturePad";
 import agreementText from "@/data/agreementText.json";
@@ -21,6 +21,7 @@ export type ElectricalWorkAgreementData = {
 type Props = ElectricalWorkAgreementData & {
   onReadyChange?: (ready: boolean) => void;
   onSignature?: (sig: string) => void;
+  actions?: ReactNode;
 };
 
 export default function ElectricalWorkAgreement({
@@ -36,6 +37,7 @@ export default function ElectricalWorkAgreement({
   completionDate,
   onReadyChange,
   onSignature,
+  actions,
 }: Props) {
   const [ack, setAck] = useState(false);
   const [clientSig, setClientSig] = useState("");
@@ -187,6 +189,7 @@ export default function ElectricalWorkAgreement({
           />
         </Box> */}
       </Stack>
+      {actions}
       </Box>
     </Paper>
   );

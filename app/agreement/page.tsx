@@ -50,19 +50,21 @@ export default function AgreementPage() {
         {...data}
         onReadyChange={setReady}
         onSignature={setSignature}
+        actions={
+          <Stack direction="row" spacing={2} mt={3}>
+            <Button variant="contained" onClick={() => router.push("/estimate")}>Back</Button>
+            <Button variant="outlined" color="secondary" onClick={() => router.push("/")}>Cancel</Button>
+            <Box sx={{ flexGrow: 1 }} />
+            {ready ? (
+              <Button variant="contained" onClick={handleSubmit}>Submit</Button>
+            ) : (
+              <Button variant="contained" disabled>
+                Next
+              </Button>
+            )}
+          </Stack>
+        }
       />
-      <Stack direction="row" spacing={2} mt={3}>
-        <Button variant="contained" onClick={() => router.push("/estimate")}>Back</Button>
-        <Button variant="outlined" color="secondary" onClick={() => router.push("/")}>Cancel</Button>
-        <Box sx={{ flexGrow: 1 }} />
-        {ready ? (
-          <Button variant="contained" onClick={handleSubmit}>Submit</Button>
-        ) : (
-          <Button variant="contained" disabled>
-            Next
-          </Button>
-        )}
-      </Stack>
     </Layout>
   );
 }
