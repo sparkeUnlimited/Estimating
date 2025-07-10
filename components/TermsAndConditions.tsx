@@ -5,7 +5,7 @@ import Paper from "@mui/material/Paper";
 
 export default function TermsAndConditions() {
   return (
-    <Paper sx={{p:4}}>
+    <Paper sx={{ p: 4 }} elevation={4}>
       <Typography variant="h4" gutterBottom>
         {termsData.title}
       </Typography>
