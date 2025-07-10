@@ -6,13 +6,20 @@ import ElectricalWorkAgreement, {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { sendEstimateDetailsLambda } from "@/lib/api";
-import { Button, Stack, Box } from "@mui/material";
+import {
+  Button,
+  Stack,
+  Box,
+  Backdrop,
+  CircularProgress,
+} from "@mui/material";
 
 export default function AgreementPage() {
   const [data, setData] = useState<ElectricalWorkAgreementData | null>(null);
   const [estimate, setEstimate] = useState<any>(null);
   const [ready, setReady] = useState(false);
   const [signature, setSignature] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,23 +36,33 @@ export default function AgreementPage() {
   if (!data || !estimate) return null;
 
   const handleSubmit = async () => {
-    if (!ready) return;
+    if (!ready || submitting) return;
 
+    setSubmitting(true);
     const payload = { ...estimate, agreement: { acknowledged: ready, signature } };
     const pdfBlob = new Blob([], { type: "application/pdf" });
     try {
       await sendEstimateDetailsLambda(payload, pdfBlob);
       localStorage.removeItem("estimateData");
       localStorage.removeItem("agreementData");
-      router.push("/");
-    } catch (err) {
+      router.push("/submitted");
+    } catch (err: any) {
       console.error(err);
+      alert(err?.message || "Submission failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <Layout title="Agreement">
-      
+      <Backdrop
+        open={submitting}
+        sx={{ zIndex: (theme) => theme.zIndex.modal + 1, color: "#fff" }}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <ElectricalWorkAgreement
         {...data}
         onReadyChange={setReady}
