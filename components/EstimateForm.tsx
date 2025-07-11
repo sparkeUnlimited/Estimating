@@ -53,12 +53,7 @@ const lookupAddress = async (
     if (data.status === "OK" && data.results[0]) {
       const comps = data.results[0].address_components as google.maps.GeocoderAddressComponent[];
       const get = (type: string) => comps.find((c) => c.types.includes(type))?.short_name || "";
-      /* setCity(get("locality") || get("postal_town"));
-      setProvince(get("administrative_area_level_1"));
-      const pc = get("postal_code");
-      if (pc) {
-        setPostalCode(formatPostalCode(pc));
-      } */
+   
     }
   } catch (err) {
     console.error("Address lookup failed", err);
@@ -77,29 +72,6 @@ const formatCanadianPhone = (value: string) => {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/* const provinces = [
-  { code: "AB", name: "Alberta" },
-  { code: "BC", name: "British Columbia" },
-  { code: "MB", name: "Manitoba" },
-  { code: "NB", name: "New Brunswick" },
-  { code: "NL", name: "Newfoundland and Labrador" },
-  { code: "NS", name: "Nova Scotia" },
-  { code: "NT", name: "Northwest Territories" },
-  { code: "NU", name: "Nunavut" },
-  { code: "ON", name: "Ontario" },
-  { code: "PE", name: "Prince Edward Island" },
-  { code: "QC", name: "Quebec" },
-  { code: "SK", name: "Saskatchewan" },
-  { code: "YT", name: "Yukon" },
-] as const; */
-
-/* const formatPostalCode = (value: string) => {
-  const upper = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-  const first = upper.slice(0, 3);
-  const last = upper.slice(3, 6);
-  return last ? `${first} ${last}` : first;
-}; */
-
 export type EstimateRow = {
   name: string;
   quantity: number;
@@ -114,9 +86,6 @@ const unitDivisor = { Each: 1, C: 100, M: 1000 } as const;
 const EstimateForm = () => {
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
-  /* const [city, setCity] = useState("");
-  const [province, setProvince] = useState("ON");
-  const [postalCode, setPostalCode] = useState(""); */
   const [contactMethod, setContactMethod] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");

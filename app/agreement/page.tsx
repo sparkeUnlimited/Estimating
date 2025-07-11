@@ -39,7 +39,14 @@ export default function AgreementPage() {
     if (!ready || submitting) return;
 
     setSubmitting(true);
-    const payload = { ...estimate, agreement: { acknowledged: ready, signature } };
+    const payload = {
+      ...estimate,
+      agreement: {
+        ...data,
+        acknowledged: ready,
+        signature,
+      },
+    };
     const pdfBlob = new Blob([], { type: "application/pdf" });
     try {
       await sendEstimateDetailsLambda(payload, pdfBlob);
