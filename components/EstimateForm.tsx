@@ -119,9 +119,6 @@ const EstimateForm = () => {
   const [startDate, setStartDate] = useState("");
   const [completionDate, setCompletionDate] = useState("");
   const [error, setError] = useState(false);
-  const [estimateTax, setEstimateTax] = useState(0);
-  const [estimateTotal, setEstimateTotal] = useState(0);
-  const [estimateGrandTotal, setEstimatedGrandTotal] = useState(0);
 
   const validate = (val: string) => emailRegex.test(val);
   const router = useRouter();
@@ -159,10 +156,6 @@ const EstimateForm = () => {
       if (typeof e.warranty === "number") setWarranty(e.warranty);
       if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
       if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
-      if (typeof e.estimateGrandTotal === "number") setEstimatedGrandTotal(e.estimatedGrandTotal);
-      if (typeof e.estimateTotal === "number") setEstimateTotal(e.estimateTotal);
-      if (typeof e.estimateTax === "number") setEstimateTax(e.estimateTax);
-
       setDiscountType(e.discountType || "None");
       if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
       setDepositAmount(e.depositAmount || "");
@@ -246,9 +239,9 @@ const EstimateForm = () => {
         ? subtotal * (discountValue / 100)
         : 0;
 
-  setEstimateTotal(subtotal - discountAmt);
-  setEstimateTax(estimateTotal * 0.13);
-  setEstimatedGrandTotal(estimateTotal + estimateTax);
+  const estimateTotal = subtotal - discountAmt;
+  const estimateTax = estimateTotal * 0.13;
+  const estimateGrandTotal = estimateTotal + estimateTax;
   const depositNum = parseFloat(depositAmount) || 0;
   const balanceDue = estimateGrandTotal - depositNum;
 
@@ -353,12 +346,8 @@ const EstimateForm = () => {
     setWarranty(3);
     setEsaFee(0);
     setHydroFee(0);
-    setEstimateTotal(0);
-    setEstimatedGrandTotal(0);
-    setEstimateTax(0);
     setDiscountValue(0);
     setDiscountType("None");
-    setDiscountValue(0);
     setDepositAmount("");
     setStartDate("");
     setCompletionDate("");
