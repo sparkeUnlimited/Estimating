@@ -162,7 +162,7 @@ const EstimateForm = () => {
       if (typeof e.estimateGrandTotal === "number") setEstimatedGrandTotal(e.estimatedGrandTotal);
       if (typeof e.estimateTotal === "number") setEstimateTotal(e.estimateTotal);
       if (typeof e.estimateTax === "number") setEstimateTax(e.estimateTax);
-     
+
       setDiscountType(e.discountType || "None");
       if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
       setDepositAmount(e.depositAmount || "");
@@ -246,9 +246,9 @@ const EstimateForm = () => {
         ? subtotal * (discountValue / 100)
         : 0;
 
-  setEstimateTotal (subtotal - discountAmt);
-  setEstimateTax (estimateTotal * 0.13); 
-  setEstimatedGrandTotal (estimateTotal + estimateTax);
+  setEstimateTotal(subtotal - discountAmt);
+  setEstimateTax(estimateTotal * 0.13);
+  setEstimatedGrandTotal(estimateTotal + estimateTax);
   const depositNum = parseFloat(depositAmount) || 0;
   const balanceDue = estimateGrandTotal - depositNum;
 
@@ -911,13 +911,13 @@ const EstimateForm = () => {
                   }}
                 />
               </Box>
-              <Typography variant="h3" fontWeight="bold">
+              <Typography variant="h6" fontWeight="bold">
                 Sub Total: {estimateTotal.toFixed(2)}
               </Typography>
-              <Typography variant="h3" fontWeight="bold">
+              <Typography variant="h6" fontWeight="bold">
                 Tax: {estimateTax.toFixed(2)}
               </Typography>
-              <Typography variant="h3" fontWeight="bold">
+              <Typography variant="h4" fontWeight="bold">
                 Grand Total: {estimateGrandTotal.toFixed(2)}
               </Typography>
               <Stack direction="row" spacing={2} mt={2}>
