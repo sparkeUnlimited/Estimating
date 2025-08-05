@@ -53,7 +53,6 @@ const lookupAddress = async (
     if (data.status === "OK" && data.results[0]) {
       const comps = data.results[0].address_components as google.maps.GeocoderAddressComponent[];
       const get = (type: string) => comps.find((c) => c.types.includes(type))?.short_name || "";
-   
     }
   } catch (err) {
     console.error("Address lookup failed", err);
@@ -120,6 +119,9 @@ const EstimateForm = () => {
   const [startDate, setStartDate] = useState("");
   const [completionDate, setCompletionDate] = useState("");
   const [error, setError] = useState(false);
+  const [estimatedTax, setEstimatedTax] = useState(0);
+  const [estimateTotal, setEstimateTotal] = useState(0);
+  const [estimatedGrandTotal, setEstimatedGrandTotal] = useState(0);
 
   const validate = (val: string) => emailRegex.test(val);
   const router = useRouter();
@@ -157,6 +159,9 @@ const EstimateForm = () => {
       if (typeof e.warranty === "number") setWarranty(e.warranty);
       if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
       if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
+      if (typeof e.grandTotal === "number") setEstimatedGrandTotal(e.grandTotal);
+      if (typeof e.totalAmt === "number") setEstimateTotal(e.totalAmt);
+      if (typeof e.taxRate === "number") setEstimatedTax(e.taxRate);
       setDiscountType(e.discountType || "None");
       if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
       setDepositAmount(e.depositAmount || "");
@@ -240,7 +245,9 @@ const EstimateForm = () => {
         ? subtotal * (discountValue / 100)
         : 0;
 
-  const grandTotal = subtotal - discountAmt;
+  const totalAmt = subtotal - discountAmt;
+  const taxRate = 0.13; // Example tax rate (13% for Ontario HST)
+  const grandTotal = totalAmt + taxRate;
   const depositNum = parseFloat(depositAmount) || 0;
   const balanceDue = grandTotal - depositNum;
 
@@ -290,6 +297,8 @@ const EstimateForm = () => {
           cost,
           warrantyAmt,
           discountAmt,
+          totalAmt,
+          taxRate,
           grandTotal,
         },
       },
@@ -304,7 +313,9 @@ const EstimateForm = () => {
         clientName: fullName,
         projectAddress: address,
         date,
-        estimatedTotal: grandTotal.toFixed(2),
+        estimateTotal: totalAmt.toFixed(2),
+        estimatedGrandTotal: grandTotal.toFixed(2),
+        estimatedTax: (totalAmt * 0.13).toFixed(2),
         depositAmount,
         balanceDue: balanceDue.toFixed(2),
         startDate: startDate.toString(),
@@ -341,6 +352,10 @@ const EstimateForm = () => {
     setWarranty(3);
     setEsaFee(0);
     setHydroFee(0);
+    setEstimateTotal(0);
+    setEstimatedGrandTotal(0);
+    setEstimatedTax(0);
+    setDiscountValue(0);
     setDiscountType("None");
     setDiscountValue(0);
     setDepositAmount("");
@@ -895,7 +910,12 @@ const EstimateForm = () => {
                   }}
                 />
               </Box>
-
+              <Typography variant="h3" fontWeight="bold">
+                Sub Total: {totalAmt.toFixed(2)}
+              </Typography>
+              <Typography variant="h3" fontWeight="bold">
+                Tax: {taxRate.toFixed(2)}
+              </Typography>
               <Typography variant="h3" fontWeight="bold">
                 Grand Total: {grandTotal.toFixed(2)}
               </Typography>
