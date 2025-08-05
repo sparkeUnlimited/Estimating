@@ -119,9 +119,9 @@ const EstimateForm = () => {
   const [startDate, setStartDate] = useState("");
   const [completionDate, setCompletionDate] = useState("");
   const [error, setError] = useState(false);
-  const [estimatedTax, setEstimatedTax] = useState(0);
+  const [estimateTax, setEstimateTax] = useState(0);
   const [estimateTotal, setEstimateTotal] = useState(0);
-  const [estimatedGrandTotal, setEstimatedGrandTotal] = useState(0);
+  const [estimateGrandTotal, setEstimatedGrandTotal] = useState(0);
 
   const validate = (val: string) => emailRegex.test(val);
   const router = useRouter();
@@ -159,9 +159,10 @@ const EstimateForm = () => {
       if (typeof e.warranty === "number") setWarranty(e.warranty);
       if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
       if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
-      if (typeof e.grandTotal === "number") setEstimatedGrandTotal(e.grandTotal);
-      if (typeof e.totalAmt === "number") setEstimateTotal(e.totalAmt);
-      if (typeof e.taxRate === "number") setEstimatedTax(e.taxRate);
+      if (typeof e.estimateGrandTotal === "number") setEstimatedGrandTotal(e.estimatedGrandTotal);
+      if (typeof e.estimateTotal === "number") setEstimateTotal(e.estimateTotal);
+      if (typeof e.estimateTax === "number") setEstimateTax(e.estimateTax);
+     
       setDiscountType(e.discountType || "None");
       if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
       setDepositAmount(e.depositAmount || "");
@@ -245,19 +246,19 @@ const EstimateForm = () => {
         ? subtotal * (discountValue / 100)
         : 0;
 
-  const totalAmt = subtotal - discountAmt;
-  const taxRate = 0.13; // Example tax rate (13% for Ontario HST)
-  const grandTotal = totalAmt + taxRate;
+  setEstimateTotal (subtotal - discountAmt);
+  setEstimateTax (estimateTotal * 0.13); 
+  setEstimatedGrandTotal (estimateTotal + estimateTax);
   const depositNum = parseFloat(depositAmount) || 0;
-  const balanceDue = grandTotal - depositNum;
+  const balanceDue = estimateGrandTotal - depositNum;
 
   useEffect(() => {
     if (!depositTouched) {
-      const half = grandTotal / 2;
+      const half = estimateGrandTotal / 2;
       const roundedUp = Math.ceil(half);
       setDepositAmount(roundedUp.toString()); // or String(roundedUp)
     }
-  }, [grandTotal, depositTouched]);
+  }, [estimateGrandTotal, depositTouched]);
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -297,9 +298,9 @@ const EstimateForm = () => {
           cost,
           warrantyAmt,
           discountAmt,
-          totalAmt,
-          taxRate,
-          grandTotal,
+          estimateTotal,
+          estimateGrandTotal,
+          estimateTax,
         },
       },
     };
@@ -313,9 +314,9 @@ const EstimateForm = () => {
         clientName: fullName,
         projectAddress: address,
         date,
-        estimateTotal: totalAmt.toFixed(2),
-        estimatedGrandTotal: grandTotal.toFixed(2),
-        estimatedTax: (totalAmt * 0.13).toFixed(2),
+        estimateTotal: estimateTotal.toFixed(2),
+        estimatedGrandTotal: estimateGrandTotal.toFixed(2),
+        estimatedTax: estimateTax.toFixed(2),
         depositAmount,
         balanceDue: balanceDue.toFixed(2),
         startDate: startDate.toString(),
@@ -354,7 +355,7 @@ const EstimateForm = () => {
     setHydroFee(0);
     setEstimateTotal(0);
     setEstimatedGrandTotal(0);
-    setEstimatedTax(0);
+    setEstimateTax(0);
     setDiscountValue(0);
     setDiscountType("None");
     setDiscountValue(0);
@@ -911,13 +912,13 @@ const EstimateForm = () => {
                 />
               </Box>
               <Typography variant="h3" fontWeight="bold">
-                Sub Total: {totalAmt.toFixed(2)}
+                Sub Total: {estimateTotal.toFixed(2)}
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                Tax: {taxRate.toFixed(2)}
+                Tax: {estimateTax.toFixed(2)}
               </Typography>
               <Typography variant="h3" fontWeight="bold">
-                Grand Total: {grandTotal.toFixed(2)}
+                Grand Total: {estimateGrandTotal.toFixed(2)}
               </Typography>
               <Stack direction="row" spacing={2} mt={2}>
                 <Button variant="contained" disabled>
