@@ -11,3 +11,88 @@
     </fo:flow>
   </fo:page-sequence>
 </fo:root>
+<?xml version="1.0" encoding="UTF-8"?>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+  <fo:layout-master-set>
+    <fo:simple-page-master master-name="A4"
+        page-height="29.7cm" page-width="21cm" margin="2cm">
+      <fo:region-body margin-top="3cm"/>
+      <fo:region-before extent="3cm"/>
+      <fo:region-after extent="1cm"/>
+    </fo:simple-page-master>
+  </fo:layout-master-set>
+
+  <fo:page-sequence master-reference="A4">
+    <fo:static-content flow-name="xsl-region-before">
+      <fo:block text-align="center" font-size="14pt" font-weight="bold">
+        <fo:external-graphic content-width="3cm" 
+          src="url('data:image/png;base64,INSERT_BASE64_LOGO_HERE')"/>
+      </fo:block>
+      <fo:block text-align="center" font-size="10pt" space-before="6pt">
+        367 Balinroan Cres, Nepean, ON K2J 3V1<br/>
+        343-596-6337 &nbsp;|&nbsp; rmaxwell@sparkeunlimited.ca
+      </fo:block>
+    </fo:static-content>
+
+    <fo:flow flow-name="xsl-region-body">
+
+      <!-- Title -->
+      <fo:block font-size="16pt" font-weight="bold" space-after="12pt" text-align="center">
+        Estimate of Work
+      </fo:block>
+
+      <!-- Project Name -->
+      <fo:block font-size="12pt" font-weight="bold" space-before="6pt" space-after="6pt">
+        <xsl:value-of select="form/projectName"/>
+      </fo:block>
+
+      <!-- Project Description -->
+      <fo:block font-size="10pt" space-after="12pt">
+        <xsl:value-of select="form/projectDescription"/>
+      </fo:block>
+
+      <!-- Materials List -->
+      <fo:block font-size="10pt" font-weight="bold" space-after="6pt">Materials:</fo:block>
+      <fo:list-block provisional-distance-between-starts="10mm">
+        <xsl:for-each select="form/materials/item">
+          <fo:list-item>
+            <fo:list-item-label end-indent="label-end()">
+              <fo:block>•</fo:block>
+            </fo:list-item-label>
+            <fo:list-item-body start-indent="body-start()">
+              <fo:block><xsl:value-of select="."/></fo:block>
+            </fo:list-item-body>
+          </fo:list-item>
+        </xsl:for-each>
+      </fo:list-block>
+
+      <!-- Estimate & Payment Terms -->
+      <fo:block font-size="12pt" font-weight="bold" space-before="12pt" space-after="6pt">
+        Estimate &amp; Payment Terms
+      </fo:block>
+      <fo:block font-size="10pt">
+        Estimate Total (not including tax): <xsl:value-of select="form/subtotal"/> <br/>
+        Estimate Tax: <xsl:value-of select="form/tax"/> <br/>
+        Deposit (50%): <xsl:value-of select="form/deposit"/> <br/>
+        Final Payment Due: <xsl:value-of select="form/finalPayment"/> <br/>
+      </fo:block>
+      <fo:block font-size="9pt" space-before="6pt">
+        Accepted payment methods: e‑transfer or methods approved by Spark-E Unlimited.
+        Overdue payment may incur a collection fee.
+      </fo:block>
+
+      <!-- 🆕 Schedule Section -->
+      <fo:block font-size="12pt" font-weight="bold" space-before="12pt" space-after="6pt">
+        Schedule
+      </fo:block>
+      <fo:block font-size="10pt" space-after="6pt">
+        Start On or Around: <xsl:value-of select="form/startDate"/> <br/>
+        Estimated Completion Date: <xsl:value-of select="form/completionDate"/>
+      </fo:block>
+      <fo:block font-size="9pt" space-after="12pt">
+        Schedule may shift due to weather, supply delays, or unforeseen conditions.
+      </fo:block>
+
+    </fo:flow>
+  </fo:page-sequence>
+</fo:root>
