@@ -31,6 +31,7 @@ export default function AgreementPage() {
     if (est) {
       setEstimate(JSON.parse(est));
     }
+    window.scrollTo(0, 0);
   }, []);
 
   if (!data || !estimate) return null;
