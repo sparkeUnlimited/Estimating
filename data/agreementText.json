@@ -8,10 +8,10 @@
       "title": "Scope of Work",
       "text": "Contractor will perform electrical services as described in the attached estimate or in writing. Any change orders must be approved in writing by the Client and may incur additional fees."
     },
-    
+
     {
       "title": "Estimate & Payment Terms",
-      "text": "Estimated Total (ex. tax): ${{estimatedTotal}}\nDeposit: 50% due before work commences: ${{depositAmount}}\nFinal Payment: Due upon project completion : ${{balanceDue}}\nAccepted payment methods: e‑transfer, or methods approved by Contractor. Late payment may incur interest or collection fees."
+      "text": "Estimated Total (ex. tax): ${{estimateGrandTotal}}\nDeposit: 50% due before work commences: ${{depositAmount}}\nFinal Payment: Due upon project completion : ${{balanceDue}}\nAccepted payment methods: e‑transfer, or methods approved by Contractor. Late payment may incur interest or collection fees."
     },
     {
       "title": "Schedule",
@@ -29,8 +29,7 @@
       "title": "Warranty",
       "text": "Contractor provides a one‑year workmanship warranty covering installation defects. ESA inspection coordination is included. Warranty does not cover non‑contracted modifications, misuse, system alterations, or third‑party damages."
     },
-    
-    
+
     {
       "title": "Entire Agreement",
       "text": "This document—together with the attached estimate and any written change orders—constitutes the entire agreement and supersedes all prior understandings. Amendments must be in writing and signed by both parties."
