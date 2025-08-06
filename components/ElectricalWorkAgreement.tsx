@@ -85,28 +85,18 @@ export default function ElectricalWorkAgreement({
         <Typography variant="h4" gutterBottom>
           Electrical Work Agreement
         </Typography>
-        <TextField
-              label="Project Name"
-              fullWidth
-              value={projectName}
-              sx={{ mt: 1 }}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
-            />
-         <TextField
-              label="Project Description"
-              fullWidth
-              value={projectDescription}
-              sx={{ mt: 1 }}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
-            />
+        <Typography>
+          <Box component="span" fontWeight="fontWeightBold">
+            Project Name:
+          </Box>{" "}
+          {projectName}
+        </Typography>
+        <Typography>
+          <Box component="span" fontWeight="fontWeightBold">
+            Project Description:
+          </Box>{" "}
+          {projectDescription}
+        </Typography>
        
         <Typography sx={{ mt: 4 }}>
           <Box component="span" fontWeight="fontWeightBold">
