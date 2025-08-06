@@ -19,7 +19,7 @@ export type ElectricalWorkAgreementData = {
   clientName: string;
   projectAddress: string;
   date: string;
-  estimateGrandTotal: string;
+  estimateTotal: string;
   depositAmount: string;
   startDate: string;
   completionDate: string;
@@ -38,7 +38,7 @@ export default function ElectricalWorkAgreement({
   clientName,
   projectAddress,
   date,
-  estimateGrandTotal,
+  estimateTotal,
   depositAmount,
   balanceDue,
   startDate,
@@ -59,7 +59,7 @@ export default function ElectricalWorkAgreement({
 
   const replaceTextPlaceholders = (text: string) =>
     text
-      .replace("{{estimateGrandTotal}}", estimateGrandTotal)
+      .replace("{{estimateTotal}}", estimateTotal)
       .replace("{{depositAmount}}", depositAmount)
       .replace("{{startDate}}", startDate)
       .replace("{{completionDate}}", completionDate)
@@ -71,7 +71,9 @@ export default function ElectricalWorkAgreement({
     return (
       <>
         {parts[0]}
-        <Link href={termsConditionsUrl}>Terms and Conditions</Link>
+        <Link href={termsConditionsUrl} target="_blank">
+          Terms and Conditions
+        </Link>
         {parts[1]}
       </>
     );

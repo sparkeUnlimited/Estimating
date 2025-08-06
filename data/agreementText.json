@@ -11,7 +11,7 @@
 
     {
       "title": "Estimate & Payment Terms",
-      "text": "Estimated Total (ex. tax): ${{estimateGrandTotal}}\nDeposit: 50% due before work commences: ${{depositAmount}}\nFinal Payment: Due upon project completion : ${{balanceDue}}\nAccepted payment methods: e‑transfer, or methods approved by Contractor. Late payment may incur interest or collection fees."
+      "text": "Estimated Total (ex. tax): ${{estimateTotal}}\nDeposit: 50% due before work commences: ${{depositAmount}}\nFinal Payment: Due upon project completion : ${{balanceDue}}\nAccepted payment methods: e‑transfer, or methods approved by Contractor. Late payment may incur interest or collection fees."
     },
     {
       "title": "Schedule",
