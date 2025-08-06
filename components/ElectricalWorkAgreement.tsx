@@ -59,7 +59,7 @@ export default function ElectricalWorkAgreement({
 
   const replaceTextPlaceholders = (text: string) =>
     text
-      .replace("{{estimatedTotal}}", estimateGrandTotal)
+      .replace("{{estimateGrandTotal}}", estimateGrandTotal)
       .replace("{{depositAmount}}", depositAmount)
       .replace("{{startDate}}", startDate)
       .replace("{{completionDate}}", completionDate)
