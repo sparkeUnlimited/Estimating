@@ -81,7 +81,7 @@
         Overdue payment may incur a collection fee.
       </fo:block>
 
-      <!-- 🆕 Schedule Section -->
+      <!-- Schedule Section -->
       <fo:block font-size="12pt" font-weight="bold" space-before="12pt" space-after="6pt">
         Schedule
       </fo:block>
