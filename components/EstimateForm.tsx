@@ -106,7 +106,7 @@ const EstimateForm = () => {
   const [labourRate, setLabourRate] = useState(125);
   const [totalFloors, setTotalFloors] = useState(0);
 
-  const [markup, setMarkup] = useState(30);
+  const [markup, setMarkup] = useState(10);
   const [overhead, setOverhead] = useState(10);
   const [warranty, setWarranty] = useState(3);
   const [esaFee, setEsaFee] = useState(0);
@@ -166,10 +166,10 @@ const EstimateForm = () => {
       // ignore corrupt localStorage data
     }
   }, []);
-
+  //Residential was set at 125
   useEffect(() => {
     if (workType === "Residential") {
-      setLabourRate(125);
+      setLabourRate(95);
     } else if (workType === "Commercial") {
       setLabourRate(145);
     } else if (workType === "Mixed") {
@@ -226,7 +226,7 @@ const EstimateForm = () => {
   const totalLabourCost = labourExtensionSum * labourRate;
   const totalMaterial = materialSum;
   const baseCost = totalMaterial + totalLabourCost;
-  const markupAmt = totalMaterial * (markup / 100);
+  const markupAmt = baseCost * (markup / 100);
   const overheadAmt = baseCost * (overhead / 100);
   const cost = baseCost + markupAmt + overheadAmt;
   const warrantyAmt = cost * (warranty / 100);
