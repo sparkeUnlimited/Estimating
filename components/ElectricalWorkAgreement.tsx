@@ -12,42 +12,30 @@ import { useState, useEffect, Fragment, ReactNode } from "react";
 import Link from "next/link";
 import SignaturePad from "@/components/SignaturePad";
 import agreementText from "@/data/agreementText.json";
+import type { AgreementDetails } from "@/types/estimate";
 
-export type ElectricalWorkAgreementData = {
-  projectName: string;
-  projectDescription: string;
-  clientName: string;
-  projectAddress: string;
-  date: string;
-  estimateTotal: string;
-  depositAmount: string;
-  startDate: string;
-  completionDate: string;
-  balanceDue: string;
-};
-
-type Props = ElectricalWorkAgreementData & {
+type Props = AgreementDetails & {
   onReadyChange?: (ready: boolean) => void;
   onSignature?: (sig: string) => void;
   actions?: ReactNode;
 };
 
-export default function ElectricalWorkAgreement({
-  projectName,
-  projectDescription,
-  clientName,
-  projectAddress,
-  date,
-  estimateTotal,
-  depositAmount,
-  balanceDue,
-  startDate,
-  completionDate,
-
-  onReadyChange,
-  onSignature,
-  actions,
-}: Props) {
+export default function ElectricalWorkAgreement(props: Props) {
+  const {
+    projectName,
+    projectDescription,
+    clientName,
+    projectAddress,
+    date,
+    estimateTotal,
+    depositAmount,
+    balanceDue,
+    startDate,
+    completionDate,
+    onReadyChange,
+    onSignature,
+    actions,
+  } = props;
   const [ack, setAck] = useState(false);
   const [clientSig, setClientSig] = useState("");
   const termsConditionsUrl = "/termsandconditions";

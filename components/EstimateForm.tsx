@@ -2,42 +2,52 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Box,
-  Button,
-  Divider,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Table,
-  TableHead,
-  TableFooter,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableContainer,
-  IconButton,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  InputAdornment,
-} from "@mui/material";
+
+// ---- MUI imports (split out) ----
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableFooter from "@mui/material/TableFooter";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import IconButton from "@mui/material/IconButton";
+import Select from "@mui/material/Select";
+import type { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import AddressAutocomplete from "@/components/AddressAutocomplete";
 
-const lookupAddress = async (
-  address: string
-  /* setCity: (s: string) => void,
-  setProvince: (s: string) => void,
-  setPostalCode: (s: string) => void */
-) => {
+
+// ---- App imports ----
+import AddressAutocomplete from "@/components/AddressAutocomplete";
+import { useEstimateData } from "@/components/providers/EstimateDataProvider";
+import type {
+  AgreementDetails,
+  DiscountType,
+  EstimateRow,
+  EstimateSubmission,
+  WorkTypeOption,
+} from "@/types/estimate";
+import { useEstimateDraft } from "@/src/hooks/useEstimateDraft";
+import { jobPresets, type JobPresetKey } from "@/src/config/jobPresets";
+
+// ---- Helpers ----
+const lookupAddress = async (address: string) => {
   if (!address) {
     return;
   }
@@ -49,16 +59,20 @@ const lookupAddress = async (
     );
     const data = await resp.json();
     if (data.status === "OK" && data.results[0]) {
-      const comps = data.results[0].address_components as google.maps.GeocoderAddressComponent[];
-      const get = (type: string) => comps.find((c) => c.types.includes(type))?.short_name || "";
+      const comps =
+        data.results[0].address_components as google.maps.GeocoderAddressComponent[];
+      const get = (type: string) =>
+        comps.find((c) => c.types.includes(type))?.short_name || "";
+      // You can wire city/province/postal from `get(...)` later
     }
   } catch (err) {
     console.error("Address lookup failed", err);
   }
 };
 
-const phoneRegex = /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
-// const postalRegex = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
+const phoneRegex =
+  /^(?:\+?1[-. ]?)?(?:\(?[2-9]\d{2}\)?[-. ]?\d{3}[-. ]?\d{4})$/;
+
 const formatCanadianPhone = (value: string) => {
   const digits = value.replace(/\D/g, "");
   const match = digits.match(/^1?([2-9]\d{2})(\d{3})(\d{4})$/);
@@ -69,19 +83,17 @@ const formatCanadianPhone = (value: string) => {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export type EstimateRow = {
-  name: string;
-  quantity: number;
-  unitCost: number;
-  unit: "Each" | "C" | "M";
-  labourUnit: number;
-  labourUnitMultiplier: "Each" | "C" | "M";
-};
-
 const unitDivisor = { Each: 1, C: 100, M: 1000 } as const;
-const workTypeOptions = ["Select Type", "Residential", "Commercial", "Mixed"] as const;
-type WorkTypeOption = (typeof workTypeOptions)[number];
-const defaultLabourRates: Record<Exclude<WorkTypeOption, "Select Type">, number> = {
+const workTypeOptions: WorkTypeOption[] = [
+  "Select Type",
+  "Residential",
+  "Commercial",
+  "Mixed",
+];
+const defaultLabourRates: Record<
+  Exclude<WorkTypeOption, "Select Type">,
+  number
+> = {
   Residential: 95,
   Commercial: 145,
   Mixed: 145,
@@ -109,6 +121,7 @@ const EstimateForm = () => {
       labourUnitMultiplier: "Each",
     },
   ]);
+
   const [workType, setWorkType] = useState<WorkTypeOption>("Select Type");
   const [labourRate, setLabourRate] = useState(125);
   const [totalFloors, setTotalFloors] = useState(0);
@@ -118,7 +131,7 @@ const EstimateForm = () => {
   const [warranty, setWarranty] = useState(3);
   const [esaFee, setEsaFee] = useState(0);
   const [hydroFee, setHydroFee] = useState(0);
-  const [discountType, setDiscountType] = useState("None");
+  const [discountType, setDiscountType] = useState<DiscountType>("None");
   const [discountValue, setDiscountValue] = useState(0);
   const [date] = useState(new Date().toISOString().slice(0, 10));
   const [depositAmount, setDepositAmount] = useState("");
@@ -128,57 +141,169 @@ const EstimateForm = () => {
   const [error, setError] = useState(false);
   const skipNextLabourAutoRef = useRef(false);
 
+// NEW: track if we've already hydrated from context / draft
+const hasHydratedRef = useRef(false);
+
+
+  const [selectedPreset, setSelectedPreset] = useState<JobPresetKey | "">("");
+
   const validate = (val: string) => emailRegex.test(val);
   const router = useRouter();
 
-  useEffect(() => {
-    const stored = localStorage.getItem("estimateData");
-    if (!stored) return;
-    try {
-      const parsed = JSON.parse(stored);
-      const c = parsed.customer || {};
-      const e = parsed.estimate || {};
-      setFullName(c.fullName || "");
-      setAddress(c.address || "");
-      setContactMethod(c.contactMethod || "");
-      setPhone(c.phone || "");
-      setEmail(c.email || "");
-      setProjectName(c.projectName || "");
-      setProjectDescription(c.projectDescription || "");
-      setRows(
-        e.rows || [
-          {
-            name: "",
-            quantity: 0,
-            unitCost: 0,
-            unit: "Each",
-            labourUnit: 0,
-            labourUnitMultiplier: "Each",
-          },
-        ]
-      );
-      const storedWorkType = isWorkType(e.workType) ? e.workType : "Select Type";
-      if (storedWorkType !== "Select Type") {
-        skipNextLabourAutoRef.current = true;
-      }
-      setWorkType(storedWorkType);
-      if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
-      if (typeof e.markup === "number") setMarkup(e.markup);
-      if (typeof e.overhead === "number") setOverhead(e.overhead);
-      if (typeof e.warranty === "number") setWarranty(e.warranty);
-      if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
-      if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
-      setDiscountType(e.discountType || "None");
-      if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
-      setDepositAmount(e.depositAmount || "");
-      setDepositTouched(!!e.depositTouched);
-      setStartDate(e.startDate || "");
-      setCompletionDate(e.completionDate || "");
-    } catch {
-      // ignore corrupt localStorage data
+  const { estimateData, setEstimateData, setAgreementData, clearEstimateData } =
+    useEstimateData();
+
+  const { draft, saveDraft, clearDraft } = useEstimateDraft();
+
+  // ---- Derived values ----
+  const customerValid =
+    fullName &&
+    address &&
+    projectName &&
+    projectDescription &&
+    contactMethod &&
+    phone &&
+    email &&
+    workType !== "Select Type";
+
+  const materialSum = rows.reduce(
+    (sum, r) => sum + r.quantity * (r.unitCost / unitDivisor[r.unit]),
+    0
+  );
+
+  const labourExtensionSum = rows.reduce(
+    (sum, r) =>
+      sum + r.quantity * (r.labourUnit / unitDivisor[r.labourUnitMultiplier]),
+    0
+  );
+
+  const totalLabourCost = labourExtensionSum * labourRate;
+  const totalMaterial = materialSum;
+  const baseCost = totalMaterial + totalLabourCost;
+  const markupAmt = baseCost * (markup / 100);
+  const overheadAmt = baseCost * (overhead / 100);
+  const cost = baseCost + markupAmt + overheadAmt;
+  const warrantyAmt = cost * (warranty / 100);
+  const subtotal = cost + warrantyAmt + esaFee + hydroFee;
+
+  const discountAmt =
+    discountType === "Dollar"
+      ? discountValue
+      : discountType === "Percent"
+      ? subtotal * (discountValue / 100)
+      : 0;
+
+  const estimateTotal = subtotal - discountAmt;
+  const estimateTax = estimateTotal * 0.13;
+  const estimateGrandTotal = estimateTotal + estimateTax;
+  const depositNum = parseFloat(depositAmount) || 0;
+  const balanceDue = estimateGrandTotal - depositNum;
+
+  // ---- Hydrate from context or draft ----
+useEffect(() => {
+  // If we've already hydrated once, don't do it again
+  if (hasHydratedRef.current) return;
+
+  // Prefer context (estimateData) if present (e.g., coming back from agreement page)
+  if (estimateData && estimateData.customer && estimateData.estimate) {
+    const c = estimateData.customer;
+    const e = estimateData.estimate;
+
+    setFullName(c.fullName || "");
+    setAddress(c.address || "");
+    setContactMethod(c.contactMethod || "");
+    setPhone(c.phone || "");
+    setEmail(c.email || "");
+    setProjectName(c.projectName || "");
+    setProjectDescription(c.projectDescription || "");
+
+    setRows(
+      e.rows || [
+        {
+          name: "",
+          quantity: 0,
+          unitCost: 0,
+          unit: "Each",
+          labourUnit: 0,
+          labourUnitMultiplier: "Each",
+        },
+      ]
+    );
+
+    const storedWorkType = isWorkType(e.workType) ? e.workType : "Select Type";
+    if (storedWorkType !== "Select Type") {
+      skipNextLabourAutoRef.current = true;
     }
-  }, []);
-  //Residential was set at 125
+    setWorkType(storedWorkType);
+
+    if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
+    if (typeof e.markup === "number") setMarkup(e.markup);
+    if (typeof e.overhead === "number") setOverhead(e.overhead);
+    if (typeof e.warranty === "number") setWarranty(e.warranty);
+    if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
+    if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
+    setDiscountType(e.discountType || "None");
+    if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
+    setDepositAmount(e.depositAmount || "");
+    setDepositTouched(!!e.depositTouched);
+    setStartDate(e.startDate || "");
+    setCompletionDate(e.completionDate || "");
+
+    hasHydratedRef.current = true;
+    return;
+  }
+
+  // If no context yet, hydrate from IndexedDB draft
+  if (draft && draft.customer && draft.estimate) {
+    const c = draft.customer;
+    const e = draft.estimate;
+
+    setFullName(c.fullName || "");
+    setAddress(c.address || "");
+    setContactMethod(c.contactMethod || "");
+    setPhone(c.phone || "");
+    setEmail(c.email || "");
+    setProjectName(c.projectName || "");
+    setProjectDescription(c.projectDescription || "");
+
+    setRows(
+      e.rows || [
+        {
+          name: "",
+          quantity: 0,
+          unitCost: 0,
+          unit: "Each",
+          labourUnit: 0,
+          labourUnitMultiplier: "Each",
+        },
+      ]
+    );
+
+    const storedWorkType = isWorkType(e.workType) ? e.workType : "Select Type";
+    if (storedWorkType !== "Select Type") {
+      skipNextLabourAutoRef.current = true;
+    }
+    setWorkType(storedWorkType);
+
+    if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
+    if (typeof e.markup === "number") setMarkup(e.markup);
+    if (typeof e.overhead === "number") setOverhead(e.overhead);
+    if (typeof e.warranty === "number") setWarranty(e.warranty);
+    if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
+    if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
+    setDiscountType(e.discountType || "None");
+    if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
+    setDepositAmount(e.depositAmount || "");
+    setDepositTouched(!!e.depositTouched);
+    setStartDate(e.startDate || "");
+    setCompletionDate(e.completionDate || "");
+
+    hasHydratedRef.current = true;
+  }
+}, [estimateData, draft]);
+
+
+  // Auto-set labour rate on work type change
   useEffect(() => {
     if (workType === "Select Type") return;
     if (skipNextLabourAutoRef.current) {
@@ -191,18 +316,141 @@ const EstimateForm = () => {
     }
   }, [workType]);
 
-  //const allFieldsFilled = fullName && address && contactMethod && phone && email && totalFloors;
-  // fullName && address && city && province && postalCode && contactMethod && phone && email;
-  const customerValid =
-    fullName &&
-    address &&
-    projectName &&
-    projectDescription &&
-    contactMethod &&
-    phone &&
-    email &&
-    workType !== "Select Type";
+  // Auto-calc default deposit as 50%
+  useEffect(() => {
+    if (!depositTouched) {
+      const half = estimateGrandTotal / 2;
+      const roundedUp = Math.ceil(half);
+      setDepositAmount(roundedUp.toString());
+    }
+  }, [estimateGrandTotal, depositTouched]);
 
+  // ---- Apply job presets ----
+  const applyJobPreset = (key: JobPresetKey) => {
+    const preset = jobPresets[key];
+    if (!preset) return;
+
+    const hasData = rows.some(
+      (r) => r.name || r.quantity || r.unitCost || r.labourUnit
+    );
+
+    setRows((prev) => {
+      if (!hasData && prev.length === 1) {
+        return preset.rows;
+      }
+      return [...prev, ...preset.rows];
+    });
+
+    if (!projectName) {
+      setProjectName(preset.defaultProjectName);
+    }
+    if (!projectDescription) {
+      setProjectDescription(preset.defaultDescription);
+    }
+  };
+
+  const handlePresetChange = (e: SelectChangeEvent<string>) => {
+    const value = e.target.value as JobPresetKey | "";
+    setSelectedPreset(value);
+    if (value) {
+      applyJobPreset(value);
+    }
+  };
+
+  // ---- Draft persistence to IndexedDB ----
+useEffect(() => {
+  // Don't save until we've done the initial hydrate
+  if (!hasHydratedRef.current) return;
+  if (!customerValid) return;
+
+  const submission: EstimateSubmission = {
+    date,
+    customer: {
+      fullName,
+      address,
+      projectName,
+      projectDescription,
+      contactMethod,
+      phone,
+      email,
+    },
+    estimate: {
+      workType,
+      labourRate,
+      rows,
+      markup,
+      overhead,
+      warranty,
+      esaFee,
+      hydroFee,
+      startDate,
+      completionDate,
+      depositAmount,
+      depositTouched,
+      discountType,
+      discountValue,
+      totals: {
+        materialSum,
+        labourExtensionSum,
+        totalLabourCost,
+        totalMaterial,
+        baseCost,
+        markupAmt,
+        overheadAmt,
+        cost,
+        warrantyAmt,
+        discountAmt,
+        estimateTotal,
+        estimateGrandTotal,
+        estimateTax,
+      },
+    },
+  };
+
+  // Fire-and-forget; errors are logged inside the hook utilities
+  saveDraft(submission);
+}, [
+  customerValid,
+  date,
+  fullName,
+  address,
+  projectName,
+  projectDescription,
+  contactMethod,
+  phone,
+  email,
+  workType,
+  labourRate,
+  rows,
+  markup,
+  overhead,
+  warranty,
+  esaFee,
+  hydroFee,
+  startDate,
+  completionDate,
+  depositAmount,
+  depositTouched,
+  discountType,
+  discountValue,
+  materialSum,
+  labourExtensionSum,
+  totalLabourCost,
+  totalMaterial,
+  baseCost,
+  markupAmt,
+  overheadAmt,
+  cost,
+  warrantyAmt,
+  discountAmt,
+  estimateTotal,
+  estimateGrandTotal,
+  estimateTax,
+  saveDraft,
+]);
+
+
+  // ---- Row helpers ----
   const addRow = () => {
     setRows((r) => [
       ...r,
@@ -222,52 +470,14 @@ const EstimateForm = () => {
   };
 
   const updateRow = (idx: number, row: Partial<EstimateRow>) => {
-    setRows((r) => r.map((item, i) => (i === idx ? { ...item, ...row } : item)));
+    setRows((r) => (r.map((item, i) => (i === idx ? { ...item, ...row } : item))));
   };
 
-  const materialSum = rows.reduce(
-    (sum, r) => sum + r.quantity * (r.unitCost / unitDivisor[r.unit]),
-    0
-  );
-
-  const labourExtensionSum = rows.reduce(
-    (sum, r) => sum + r.quantity * (r.labourUnit / unitDivisor[r.labourUnitMultiplier]),
-    0
-  );
-
-  const totalLabourCost = labourExtensionSum * labourRate;
-  const totalMaterial = materialSum;
-  const baseCost = totalMaterial + totalLabourCost;
-  const markupAmt = baseCost * (markup / 100);
-  const overheadAmt = baseCost * (overhead / 100);
-  const cost = baseCost + markupAmt + overheadAmt;
-  const warrantyAmt = cost * (warranty / 100);
-  const subtotal = cost + warrantyAmt + esaFee + hydroFee;
-
-  const discountAmt =
-    discountType === "Dollar"
-      ? discountValue
-      : discountType === "Percent"
-        ? subtotal * (discountValue / 100)
-        : 0;
-
-  const estimateTotal = subtotal - discountAmt;
-  const estimateTax = estimateTotal * 0.13;
-  const estimateGrandTotal = estimateTotal + estimateTax;
-  const depositNum = parseFloat(depositAmount) || 0;
-  const balanceDue = estimateGrandTotal - depositNum;
-
-  useEffect(() => {
-    if (!depositTouched) {
-      const half = estimateGrandTotal / 2;
-      const roundedUp = Math.ceil(half);
-      setDepositAmount(roundedUp.toString()); // or String(roundedUp)
-    }
-  }, [estimateGrandTotal, depositTouched]);
-
+  // ---- Submit / Cancel ----
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = {
+
+    const data: EstimateSubmission = {
       date,
       customer: {
         fullName,
@@ -284,6 +494,7 @@ const EstimateForm = () => {
         rows,
         markup,
         overhead,
+        warranty,
         esaFee,
         hydroFee,
         startDate,
@@ -310,24 +521,38 @@ const EstimateForm = () => {
       },
     };
 
-    localStorage.setItem("estimateData", JSON.stringify(data));
-    localStorage.setItem(
-      "agreementData",
-      JSON.stringify({
-        projectName,
-        projectDescription,
-        clientName: fullName,
-        projectAddress: address,
-        date,
-        estimateTotal: estimateTotal.toFixed(2),
-        estimateGrandTotal: estimateGrandTotal.toFixed(2),
-        estimateTax: estimateTax.toFixed(2),
-        depositAmount,
-        balanceDue: balanceDue.toFixed(2),
-        startDate: startDate.toString(),
-        completionDate: completionDate.toString(),
-      })
-    );
+    const agreementPayload: AgreementDetails = {
+      projectName,
+      projectDescription,
+      clientName: fullName,
+      projectAddress: address,
+      date,
+      estimateTotal: estimateTotal.toFixed(2),
+      estimateGrandTotal: estimateGrandTotal.toFixed(2),
+      estimateTax: estimateTax.toFixed(2),
+      depositAmount,
+      balanceDue: balanceDue.toFixed(2),
+      startDate: startDate.toString(),
+      completionDate: completionDate.toString(),
+    };
+
+    setEstimateData(data);
+    setAgreementData(agreementPayload);
+
+    // Try to send to API; if it fails, log it but still move on
+    try {
+      await fetch("/api/estimates", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      // Optionally clear draft once server has it
+      // await clearDraft();
+    } catch (err) {
+      console.error("Failed to save estimate via API", err);
+    }
 
     router.push("/agreement");
   };
@@ -364,11 +589,12 @@ const EstimateForm = () => {
     setStartDate("");
     setCompletionDate("");
     setDepositTouched(false);
-    localStorage.removeItem("estimateData");
-    localStorage.removeItem("agreementData");
+    clearEstimateData();
+    clearDraft();
     router.push("/");
   };
 
+  // ---- Render ----
   return (
     <Paper sx={{ p: 4 }} elevation={4}>
       <Box component="form" onSubmit={handleNext}>
@@ -381,7 +607,7 @@ const EstimateForm = () => {
           </Box>
 
           <Grid container spacing={2}>
-            <Grid size={8}>
+            <Grid size={{xs:12, md:8}}>
               <TextField
                 label="Project Name"
                 value={projectName}
@@ -391,8 +617,9 @@ const EstimateForm = () => {
               />
             </Grid>
           </Grid>
+
           <Grid container spacing={2}>
-            <Grid size={12}>
+            <Grid size={{xs:12}}>
               <TextField
                 label="Project Description"
                 value={projectDescription}
@@ -404,6 +631,7 @@ const EstimateForm = () => {
               />
             </Grid>
           </Grid>
+
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
             <TextField
               label="Project Start Date"
@@ -412,11 +640,7 @@ const EstimateForm = () => {
               required
               fullWidth
               onChange={(e) => setStartDate(e.target.value)}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              InputLabelProps={{ shrink: true }}
             />
 
             <TextField
@@ -426,11 +650,7 @@ const EstimateForm = () => {
               required
               fullWidth
               onChange={(e) => setCompletionDate(e.target.value)}
-              slotProps={{
-                inputLabel: {
-                  shrink: true,
-                },
-              }}
+              InputLabelProps={{ shrink: true }}
             />
           </Stack>
 
@@ -439,7 +659,7 @@ const EstimateForm = () => {
           </Typography>
 
           <Grid container spacing={2}>
-            <Grid size={8}>
+            <Grid size={{xs:12, md:8}}>
               <TextField
                 label="Full Name"
                 value={fullName}
@@ -449,8 +669,9 @@ const EstimateForm = () => {
               />
             </Grid>
           </Grid>
+
           <Grid container spacing={2}>
-            <Grid size={12}>
+            <Grid size={{xs:12}}>
               <AddressAutocomplete
                 value={address}
                 onChange={(val) => setAddress(val)}
@@ -468,9 +689,14 @@ const EstimateForm = () => {
               value={contactMethod}
               onChange={(e) => setContactMethod(e.target.value)}
             >
-              <FormControlLabel value="phone" control={<Radio />} label="Phone/Mobile" />
+              <FormControlLabel
+                value="phone"
+                control={<Radio />}
+                label="Phone/Mobile"
+              />
               <FormControlLabel value="email" control={<Radio />} label="Email" />
             </RadioGroup>
+
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mt={2}>
               <TextField
                 label="Phone"
@@ -480,12 +706,10 @@ const EstimateForm = () => {
                 required
                 fullWidth
                 type="tel"
-                slotProps={{
-                  htmlInput: {
-                    pattern: phoneRegex.source,
-                    title: "Valid Canadian phone number",
-                    inputMode: "tel",
-                  },
+                inputProps={{
+                  pattern: phoneRegex.source,
+                  title: "Valid Canadian phone number",
+                  inputMode: "tel",
                 }}
               />
               <TextField
@@ -509,14 +733,21 @@ const EstimateForm = () => {
             <Typography variant="h6" fontWeight="bold" my={4}>
               Estimate Items
             </Typography>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems="center">
+
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              alignItems="center"
+            >
               <FormControl fullWidth required sx={{ mb: { xs: 2, sm: 3 } }}>
                 <InputLabel id="wt">Work Type</InputLabel>
                 <Select
                   labelId="wt"
                   label="Work Type"
                   value={workType}
-                  onChange={(e) => setWorkType(e.target.value as WorkTypeOption)}
+                  onChange={(e) =>
+                    setWorkType(e.target.value as WorkTypeOption)
+                  }
                 >
                   <MenuItem value="Select Type">Select Type</MenuItem>
                   <MenuItem value="Residential">Residential</MenuItem>
@@ -524,14 +755,7 @@ const EstimateForm = () => {
                   <MenuItem value="Mixed">Mixed</MenuItem>
                 </Select>
               </FormControl>
-              {/* <TextField
-                label="How many floors in the building?"
-                type="number"
-                fullWidth
-                value={totalFloors || ""}
-                onChange={(e) => setTotalFloors(parseInt(e.target.value))}
-                margin="normal"
-              /> */}
+
               {developing && (
                 <TextField
                   label="Labour Rate"
@@ -543,9 +767,44 @@ const EstimateForm = () => {
                 />
               )}
             </Stack>
-          </Box>
 
-          {/* <HighRiseLabourAdjuster totalFloors={totalFloors} /> */}
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              alignItems="center"
+              mt={1}
+            >
+              <FormControl fullWidth sx={{ mb: { xs: 2, sm: 3 } }}>
+                <InputLabel id="job-preset-label">Common Job Preset</InputLabel>
+                <Select
+                  labelId="job-preset-label"
+                  label="Common Job Preset"
+                  value={selectedPreset}
+                  onChange={handlePresetChange}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value="panel_replacement">Panel Replacement</MenuItem>
+                  <MenuItem value="service_upgrade">Service Upgrade</MenuItem>
+                  <MenuItem value="ceiling_fan">Ceiling Fan Upgrade</MenuItem>
+                  <MenuItem value="receptacle_standard">
+                    Receptacle Replacements (Standard)
+                  </MenuItem>
+                  <MenuItem value="receptacle_gfci">
+                    Receptacle Replacements (GFCI)
+                  </MenuItem>
+                  <MenuItem value="basement_reno_basic">
+                    Basement Renovation (Basic)
+                  </MenuItem>
+                  <MenuItem value="tesla_charger">Tesla EV Charger</MenuItem>
+                  <MenuItem value="generator_install">
+                    Generator + ATS
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Stack>
+          </Box>
 
           {customerValid && (
             <>
@@ -553,9 +812,12 @@ const EstimateForm = () => {
                 <Table size="small">
                   <TableBody>
                     {rows.map((row, idx) => {
-                      const materialExt = row.quantity * (row.unitCost / unitDivisor[row.unit]);
+                      const materialExt =
+                        row.quantity * (row.unitCost / unitDivisor[row.unit]);
                       const labourExt =
-                        row.quantity * (row.labourUnit / unitDivisor[row.labourUnitMultiplier]);
+                        row.quantity *
+                        (row.labourUnit /
+                          unitDivisor[row.labourUnitMultiplier]);
                       const lc = labourExt * labourRate;
                       return (
                         <React.Fragment key={`row-${idx}`}>
@@ -566,13 +828,11 @@ const EstimateForm = () => {
                                 label="Material Name"
                                 fullWidth
                                 value={row.name}
-                                onChange={(e) => updateRow(idx, { name: e.target.value })}
+                                onChange={(e) =>
+                                  updateRow(idx, { name: e.target.value })
+                                }
                                 required
-                                slotProps={{
-                                  input: {
-                                    inputProps: { maxLength: 255 },
-                                  },
-                                }}
+                                inputProps={{ maxLength: 255 }}
                               />
                             </TableCell>
                           </TableRow>
@@ -594,7 +854,9 @@ const EstimateForm = () => {
                                 type="number"
                                 value={row.quantity}
                                 onChange={(e) =>
-                                  updateRow(idx, { quantity: Number(e.target.value) })
+                                  updateRow(idx, {
+                                    quantity: Number(e.target.value),
+                                  })
                                 }
                               />
                             </TableCell>
@@ -604,7 +866,9 @@ const EstimateForm = () => {
                                 type="number"
                                 value={row.unitCost}
                                 onChange={(e) =>
-                                  updateRow(idx, { unitCost: Number(e.target.value) })
+                                  updateRow(idx, {
+                                    unitCost: Number(e.target.value),
+                                  })
                                 }
                               />
                             </TableCell>
@@ -631,7 +895,9 @@ const EstimateForm = () => {
                                 type="number"
                                 value={row.labourUnit}
                                 onChange={(e) =>
-                                  updateRow(idx, { labourUnit: Number(e.target.value) })
+                                  updateRow(idx, {
+                                    labourUnit: Number(e.target.value),
+                                  })
                                 }
                               />
                             </TableCell>
@@ -676,30 +942,42 @@ const EstimateForm = () => {
                   <TableFooter>
                     <TableRow>
                       <TableCell colSpan={3}>
-                        <Typography fontWeight="bold">Total Material Cost</Typography>
+                        <Typography fontWeight="bold">
+                          Total Material Cost
+                        </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography fontWeight="bold">{materialSum.toFixed(2)}</Typography>
+                        <Typography fontWeight="bold">
+                          {materialSum.toFixed(2)}
+                        </Typography>
                       </TableCell>
                       <TableCell colSpan={5} />
                     </TableRow>
                     <TableRow>
                       <TableCell colSpan={3}>
-                        <Typography fontWeight="bold">Total Labour Extension</Typography>
+                        <Typography fontWeight="bold">
+                          Total Labour Extension
+                        </Typography>
                       </TableCell>
                       <TableCell colSpan={3} />
                       <TableCell>
-                        <Typography fontWeight="bold">{labourExtensionSum.toFixed(2)}</Typography>
+                        <Typography fontWeight="bold">
+                          {labourExtensionSum.toFixed(2)}
+                        </Typography>
                       </TableCell>
                       <TableCell colSpan={2} />
                     </TableRow>
                     <TableRow>
                       <TableCell colSpan={3}>
-                        <Typography fontWeight="bold">Total Labour Cost</Typography>
+                        <Typography fontWeight="bold">
+                          Total Labour Cost
+                        </Typography>
                       </TableCell>
                       <TableCell colSpan={4} />
                       <TableCell>
-                        <Typography fontWeight="bold">{totalLabourCost.toFixed(2)}</Typography>
+                        <Typography fontWeight="bold">
+                          {totalLabourCost.toFixed(2)}
+                        </Typography>
                       </TableCell>
                       <TableCell />
                     </TableRow>
@@ -709,7 +987,6 @@ const EstimateForm = () => {
                           Total Cost
                         </Typography>
                       </TableCell>
-
                       <TableCell>
                         <Typography variant="h6" fontWeight="bold">
                           {baseCost.toFixed(2)}
@@ -720,11 +997,14 @@ const EstimateForm = () => {
                   </TableFooter>
                 </Table>
               </TableContainer>
+
               <Box textAlign="right" my={1}>
                 <IconButton onClick={addRow} size="small">
                   <AddIcon />
                 </IconButton>
               </Box>
+
+              {/* Markup / Overhead / Warranty / Fees */}
               <TableContainer sx={{ overflowX: "auto" }}>
                 <Table>
                   <TableHead>
@@ -820,7 +1100,9 @@ const EstimateForm = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography fontWeight="bold">ESA Total: {esaFee.toFixed(2)}</Typography>
+                        <Typography fontWeight="bold">
+                          ESA Total: {esaFee.toFixed(2)}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography fontWeight="bold">
@@ -831,6 +1113,8 @@ const EstimateForm = () => {
                   </TableFooter>
                 </Table>
               </TableContainer>
+
+              {/* Discount */}
               <TableContainer sx={{ overflowX: "auto" }}>
                 <Table>
                   <TableHead>
@@ -851,7 +1135,9 @@ const EstimateForm = () => {
                             labelId="disc"
                             label="Discount"
                             value={discountType}
-                            onChange={(e) => setDiscountType(e.target.value)}
+                            onChange={(e) =>
+                              setDiscountType(e.target.value as DiscountType)
+                            }
                           >
                             <MenuItem value="None">None</MenuItem>
                             <MenuItem value="Dollar">Dollar Discount</MenuItem>
@@ -860,12 +1146,15 @@ const EstimateForm = () => {
                         </FormControl>
                       </TableCell>
                       <TableCell>
-                        {(discountType === "Dollar" || discountType === "Percent") && (
+                        {(discountType === "Dollar" ||
+                          discountType === "Percent") && (
                           <TextField
                             label="Discount Value"
                             type="number"
                             value={discountValue}
-                            onChange={(e) => setDiscountValue(Number(e.target.value))}
+                            onChange={(e) =>
+                              setDiscountValue(Number(e.target.value))
+                            }
                           />
                         )}
                       </TableCell>
@@ -883,6 +1172,7 @@ const EstimateForm = () => {
                 </Table>
               </TableContainer>
 
+              {/* Deposit / Totals */}
               <Box textAlign="right" my={2}>
                 <TextField
                   label="Deposit"
@@ -893,7 +1183,9 @@ const EstimateForm = () => {
                     setDepositAmount(e.target.value);
                   }}
                   InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
                   }}
                   sx={{ mr: 2 }}
                 />
@@ -903,10 +1195,13 @@ const EstimateForm = () => {
                   value={balanceDue.toFixed(2)}
                   InputProps={{
                     readOnly: true,
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
                   }}
                 />
               </Box>
+
               <Typography variant="h6" fontWeight="bold">
                 Sub Total: {estimateTotal.toFixed(2)}
               </Typography>
@@ -916,11 +1211,16 @@ const EstimateForm = () => {
               <Typography variant="h4" fontWeight="bold">
                 Grand Total: {estimateGrandTotal.toFixed(2)}
               </Typography>
+
               <Stack direction="row" spacing={2} mt={2}>
                 <Button variant="contained" disabled>
                   Back
                 </Button>
-                <Button variant="outlined" color="secondary" onClick={handleCancel}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleCancel}
+                >
                   Cancel
                 </Button>
                 <Box sx={{ flexGrow: 1 }} />
