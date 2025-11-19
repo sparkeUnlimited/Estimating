@@ -1,6 +1,7 @@
 import "/styles/globals.css";
 import "/styles/calendar.css";
 import { GoogleMapsProvider } from "@/components/providers/GoogleMapsProvider";
+import { EstimateDataProvider } from "@/components/providers/EstimateDataProvider";
 
 export const metadata = {
   title: "Estimating App - Spark-E",
@@ -13,7 +14,9 @@ export const metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => (
   <html lang="en">
     <body>
-      <GoogleMapsProvider>{children}</GoogleMapsProvider>
+      <GoogleMapsProvider>
+        <EstimateDataProvider>{children}</EstimateDataProvider>
+      </GoogleMapsProvider>
     </body>
   </html>
 );
