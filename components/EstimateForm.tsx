@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -32,7 +31,6 @@ import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
-import HighRiseLabourAdjuster from "@/components/HighRiseLabourAdjuster";
 
 const lookupAddress = async (
   address: string
@@ -81,6 +79,15 @@ export type EstimateRow = {
 };
 
 const unitDivisor = { Each: 1, C: 100, M: 1000 } as const;
+const workTypeOptions = ["Select Type", "Residential", "Commercial", "Mixed"] as const;
+type WorkTypeOption = (typeof workTypeOptions)[number];
+const defaultLabourRates: Record<Exclude<WorkTypeOption, "Select Type">, number> = {
+  Residential: 95,
+  Commercial: 145,
+  Mixed: 145,
+};
+const isWorkType = (value: unknown): value is WorkTypeOption =>
+  typeof value === "string" && workTypeOptions.includes(value as WorkTypeOption);
 
 const EstimateForm = () => {
   const [fullName, setFullName] = useState("");
@@ -102,7 +109,7 @@ const EstimateForm = () => {
       labourUnitMultiplier: "Each",
     },
   ]);
-  const [workType, setWorkType] = useState("Select Type");
+  const [workType, setWorkType] = useState<WorkTypeOption>("Select Type");
   const [labourRate, setLabourRate] = useState(125);
   const [totalFloors, setTotalFloors] = useState(0);
 
@@ -119,6 +126,7 @@ const EstimateForm = () => {
   const [startDate, setStartDate] = useState("");
   const [completionDate, setCompletionDate] = useState("");
   const [error, setError] = useState(false);
+  const skipNextLabourAutoRef = useRef(false);
 
   const validate = (val: string) => emailRegex.test(val);
   const router = useRouter();
@@ -149,7 +157,11 @@ const EstimateForm = () => {
           },
         ]
       );
-      setWorkType(e.workType || "Select Type");
+      const storedWorkType = isWorkType(e.workType) ? e.workType : "Select Type";
+      if (storedWorkType !== "Select Type") {
+        skipNextLabourAutoRef.current = true;
+      }
+      setWorkType(storedWorkType);
       if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
       if (typeof e.markup === "number") setMarkup(e.markup);
       if (typeof e.overhead === "number") setOverhead(e.overhead);
@@ -168,14 +180,14 @@ const EstimateForm = () => {
   }, []);
   //Residential was set at 125
   useEffect(() => {
-    if (workType === "Residential") {
-      setLabourRate(95);
-    } else if (workType === "Commercial") {
-      setLabourRate(145);
-    } else if (workType === "Mixed") {
-      setLabourRate(145);
-    } else {
-      setLabourRate(0); // Default or unrecognized type
+    if (workType === "Select Type") return;
+    if (skipNextLabourAutoRef.current) {
+      skipNextLabourAutoRef.current = false;
+      return;
+    }
+    const nextRate = defaultLabourRates[workType];
+    if (typeof nextRate === "number") {
+      setLabourRate(nextRate);
     }
   }, [workType]);
 
@@ -504,12 +516,12 @@ const EstimateForm = () => {
                   labelId="wt"
                   label="Work Type"
                   value={workType}
-                  onChange={(e) => setWorkType(e.target.value)}
+                  onChange={(e) => setWorkType(e.target.value as WorkTypeOption)}
                 >
                   <MenuItem value="Select Type">Select Type</MenuItem>
                   <MenuItem value="Residential">Residential</MenuItem>
                   <MenuItem value="Commercial">Commercial</MenuItem>
-                  <MenuItem value="Commercial">Mixed</MenuItem>
+                  <MenuItem value="Mixed">Mixed</MenuItem>
                 </Select>
               </FormControl>
               {/* <TextField
@@ -880,11 +892,8 @@ const EstimateForm = () => {
                     setDepositTouched(true);
                     setDepositAmount(e.target.value);
                   }}
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                    },
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}
                   sx={{ mr: 2 }}
                 />
@@ -892,11 +901,9 @@ const EstimateForm = () => {
                   label="Balance Due"
                   type="number"
                   value={balanceDue.toFixed(2)}
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                    },
+                  InputProps={{
+                    readOnly: true,
+                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
                   }}
                 />
               </Box>

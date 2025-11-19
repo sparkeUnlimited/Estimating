@@ -1,6 +1,6 @@
 "use client";
 import Layout from "@/layout/Layout";
-import { Box, Typography, Button, Paper } from "@mui/material";
+import { Typography, Button, Paper } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 export default function SubmittedPage() {

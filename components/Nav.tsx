@@ -3,7 +3,6 @@
 import * as React from "react";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
-import Logo from "@/components/Logo";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
