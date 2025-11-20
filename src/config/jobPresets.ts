@@ -1,4 +1,5 @@
 // src/config/jobPresets.ts
+
 import type { EstimateRow } from "@/types/estimate";
 
 export type JobPresetKey =
@@ -12,136 +13,281 @@ export type JobPresetKey =
   | "generator_install";
 
 export type JobPreset = {
+  key: JobPresetKey;
   label: string;
   defaultProjectName: string;
   defaultDescription: string;
   rows: EstimateRow[];
 };
 
-const emptyRow = (name: string, quantity = 1, labourUnit = 0, unitCost = 0): EstimateRow => ({
-  name,
-  quantity,
-  unitCost,
-  unit: "Each",
-  labourUnit,
-  labourUnitMultiplier: "Each",
-});
-
 export const jobPresets: Record<JobPresetKey, JobPreset> = {
   panel_replacement: {
-    label: "Panel Replacement (100–200A)",
+    key: "panel_replacement",
+    label: "Panel Replacement",
     defaultProjectName: "Electrical Panel Replacement",
     defaultDescription:
-      "Remove existing panel, install new loadcentre, re-terminate existing circuits, label breakers, and coordinate ESA inspection.",
+      "Remove existing panel, install new breaker panel, reconnect existing circuits, and label breakers.",
     rows: [
-      emptyRow("New loadcentre (40-circuit, 120/240V)", 1, 4),
-      emptyRow("Main breaker (100–200A, as required)", 1, 0.25),
-      emptyRow("Allowance for branch breakers (mix of 1P/2P)", 1, 0.75),
-      emptyRow("Bonding bushings, locknuts, and connectors", 1, 0.4),
-      emptyRow("Anti-short bushings / cable clamps / staples", 1, 0.3),
-      emptyRow("Grounding & bonding conductors/hardware", 1, 0.5),
-      emptyRow("Panel screws / hardware & fasteners", 1, 0.15),
-      emptyRow("Disposal of old panel and scrap", 1, 0.3),
+      {
+        name: "New breaker panel (40–60 circuit)",
+        quantity: 1,
+        unitCost: 450,
+        unit: "Each",
+        labourUnit: 4,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Panel Replacement",
+      },
+      {
+        name: "Main breaker / disconnect kit",
+        quantity: 1,
+        unitCost: 120,
+        unit: "Each",
+        labourUnit: 0.5,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Panel Replacement",
+      },
+      {
+        name: "Misc. connectors, screws, anchors, tape, labels",
+        quantity: 1,
+        unitCost: 80,
+        unit: "Each",
+        labourUnit: 1,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Panel Replacement",
+      },
     ],
   },
 
   service_upgrade: {
-    label: "Service Upgrade (Meter & Mast)",
+    key: "service_upgrade",
+    label: "Service Upgrade",
     defaultProjectName: "Service Upgrade",
     defaultDescription:
-      "Upgrade overhead/underground service, meterbase, mast (if applicable), and panel terminations, including coordination with Hydro and ESA.",
+      "Upgrade existing electrical service, including meter base, mast, and service conductors as required by utility.",
     rows: [
-      emptyRow("New meterbase (approved for service size)", 1, 1.5),
-      emptyRow("Service mast / conduit and fittings", 1, 1.25),
-      emptyRow("Service entrance cable / conductors", 1, 1.5),
-      emptyRow("Weatherhead, hub, clamps, straps", 1, 0.75),
-      emptyRow("Bonding bushings and grounding hardware", 1, 0.5),
-      emptyRow("Sealant, screws, anchors, misc. fasteners", 1, 0.3),
+      {
+        name: "Meter base and fittings",
+        quantity: 1,
+        unitCost: 250,
+        unit: "Each",
+        labourUnit: 3,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Service Upgrade",
+      },
+      {
+        name: "Service mast, weatherhead, clamps",
+        quantity: 1,
+        unitCost: 200,
+        unit: "Each",
+        labourUnit: 2,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Service Upgrade",
+      },
+      {
+        name: "Bonding, ground rods, clamps, wire",
+        quantity: 1,
+        unitCost: 150,
+        unit: "Each",
+        labourUnit: 1.5,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Service Upgrade",
+      },
     ],
   },
 
   ceiling_fan: {
-    label: "Ceiling Fan Replacement/Upgrade",
+    key: "ceiling_fan",
+    label: "Ceiling Fan Upgrade",
     defaultProjectName: "Ceiling Fan Replacement",
     defaultDescription:
-      "Replace existing light/fan with new ceiling fan, verify support box, make terminations, and test operation.",
+      "Replace existing light fixture with customer-supplied ceiling fan, including suitable fan-rated box where required.",
     rows: [
-      emptyRow("Ceiling fan (supplied by owner or contractor)", 1, 0.75),
-      emptyRow("Fan-rated junction box / brace (if required)", 1, 0.6),
-      emptyRow("Fan-rated box screws, straps, hardware", 1, 0.2),
-      emptyRow("Wire connectors, tape, small materials", 1, 0.15),
+      {
+        name: "Fan-rated box, brace, screws",
+        quantity: 1,
+        unitCost: 45,
+        unit: "Each",
+        labourUnit: 1.2,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Ceiling Fan Upgrade",
+      },
+      {
+        name: "Misc. connectors and hardware",
+        quantity: 1,
+        unitCost: 15,
+        unit: "Each",
+        labourUnit: 0.3,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Ceiling Fan Upgrade",
+      },
     ],
   },
 
   receptacle_standard: {
-    label: "Standard Receptacle Replacement",
-    defaultProjectName: "Receptacle Replacements",
+    key: "receptacle_standard",
+    label: "Receptacle Replacements (Standard)",
+    defaultProjectName: "Receptacle Replacement",
     defaultDescription:
-      "Replace existing standard receptacles with new devices, verify terminations, and test polarity/GFCI where required.",
+      "Replace existing receptacles with new tamper-resistant receptacles. Includes cover plates and minor box repairs as required.",
     rows: [
-      emptyRow("Standard 15A/20A receptacles (allowance)", 1, 0.15),
-      emptyRow("Device plates (Decora or standard)", 1, 0.05),
-      emptyRow("Wire connectors, tape, misc. materials", 1, 0.05),
+      {
+        name: "Standard TR receptacle",
+        quantity: 10,
+        unitCost: 3.5,
+        unit: "Each",
+        labourUnit: 0.25,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Receptacle Replacements (Standard)",
+      },
+      {
+        name: "Decora plates and screws",
+        quantity: 10,
+        unitCost: 1.25,
+        unit: "Each",
+        labourUnit: 0.05,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Receptacle Replacements (Standard)",
+      },
     ],
   },
 
   receptacle_gfci: {
-    label: "GFCI Receptacle Replacement",
-    defaultProjectName: "GFCI Receptacle Replacements",
+    key: "receptacle_gfci",
+    label: "Receptacle Replacements (GFCI)",
+    defaultProjectName: "GFCI Receptacle Upgrade",
     defaultDescription:
-      "Replace existing receptacles with GFCI-type where required, test function, and label downstream protection.",
+      "Replace selected receptacles with GFCI receptacles as required by code in kitchens, bathrooms, and exterior locations.",
     rows: [
-      emptyRow("GFCI receptacles (per location)", 1, 0.25),
-      emptyRow("In-use / weatherproof covers (if exterior)", 1, 0.25),
-      emptyRow("Device plates and misc. hardware", 1, 0.05),
+      {
+        name: "GFCI receptacle",
+        quantity: 4,
+        unitCost: 25,
+        unit: "Each",
+        labourUnit: 0.4,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Receptacle Replacements (GFCI)",
+      },
+      {
+        name: "Weatherproof in-use covers (where required)",
+        quantity: 2,
+        unitCost: 30,
+        unit: "Each",
+        labourUnit: 0.3,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Receptacle Replacements (GFCI)",
+      },
     ],
   },
 
   basement_reno_basic: {
-    label: "Basement Renovation (Basic Lighting & Receptacles)",
-    defaultProjectName: "Basement Electrical Rough-in & Finish",
+    key: "basement_reno_basic",
+    label: "Basement Renovation (Basic)",
+    defaultProjectName: "Basement Electrical Rough-In",
     defaultDescription:
-      "Provide rough-in and finishing for lights, receptacles, and circuits in basement renovation, including ESA inspection.",
+      "Provide rough-in and finishing for basement renovation including receptacles, lighting, and circuits as specified.",
     rows: [
-      emptyRow("NMD90 cable (allowance per sq. ft.)", 1, 2),
-      emptyRow("Lighting boxes and brackets", 1, 1),
-      emptyRow("Receptacle boxes", 1, 1),
-      emptyRow("Switch boxes", 1, 0.75),
-      emptyRow("Pot lights / fixtures (allowance)", 1, 1.5),
-      emptyRow("Standard receptacles and switches", 1, 1.2),
-      emptyRow("Smoke/CO combination alarms", 1, 0.5),
-      emptyRow("Staples, straps, connectors, misc.", 1, 1),
+      {
+        name: "General lighting rough-in (per room average)",
+        quantity: 4,
+        unitCost: 75,
+        unit: "Each",
+        labourUnit: 2,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Basement Renovation",
+      },
+      {
+        name: "Receptacle circuits and devices",
+        quantity: 12,
+        unitCost: 15,
+        unit: "Each",
+        labourUnit: 0.5,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Basement Renovation",
+      },
+      {
+        name: "Smoke/CO combo rough-in and device",
+        quantity: 2,
+        unitCost: 70,
+        unit: "Each",
+        labourUnit: 0.75,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Basement Renovation",
+      },
     ],
   },
 
   tesla_charger: {
-    label: "Tesla Wall Connector / EV Charger",
-    defaultProjectName: "Tesla EV Charger Installation",
+    key: "tesla_charger",
+    label: "Tesla EV Charger",
+    defaultProjectName: "Tesla Wall Connector Install",
     defaultDescription:
-      "Install Tesla Wall Connector or EV charger, including dedicated circuit, cable run, terminations, and commissioning.",
+      "Supply and install Tesla Wall Connector (or customer-supplied charger) including circuit, wiring, and labeling.",
     rows: [
-      emptyRow("Tesla Wall Connector / EVSE", 1, 1.5),
-      emptyRow("Breaker (40–60A, per design)", 1, 0.25),
-      emptyRow("NMD90 / Teck90 / EMT + wire (run allowance)", 1, 2.5),
-      emptyRow("Conduit fittings / connectors / straps", 1, 0.75),
-      emptyRow("Junction box / pull box (if required)", 1, 0.5),
-      emptyRow("Labeling and circuit directory update", 1, 0.25),
+      {
+        name: "NMD/Teck cable and fittings for EV circuit",
+        quantity: 1,
+        unitCost: 200,
+        unit: "Each",
+        labourUnit: 3,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Tesla EV Charger",
+      },
+      {
+        name: "Breaker and terminations",
+        quantity: 1,
+        unitCost: 60,
+        unit: "Each",
+        labourUnit: 0.5,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Tesla EV Charger",
+      },
     ],
   },
 
   generator_install: {
-    label: "Standby Generator + ATS",
-    defaultProjectName: "Standby Generator & Transfer Switch",
+    key: "generator_install",
+    label: "Generator + ATS",
+    defaultProjectName: "Standby Generator Installation",
     defaultDescription:
-      "Install standby generator and automatic transfer switch, including concrete pad (if in scope), conduits, wiring, and terminations.",
+      "Install standby generator and automatic transfer switch (ATS) with appropriate circuits and interconnections.",
     rows: [
-      emptyRow("Standby generator (size as specified)", 1, 4),
-      emptyRow("Automatic transfer switch (ATS)", 1, 3),
-      emptyRow("Conduit and fittings between gen/ATS/panel", 1, 2.5),
-      emptyRow("Control wiring and terminations", 1, 1.5),
-      emptyRow("Concrete pad / mounting hardware (if included)", 1, 1.5),
-      emptyRow("Ground rods, clamps, and grounding conductor", 1, 1.25),
-      emptyRow("Labeling, signage, and directory updates", 1, 0.5),
+      {
+        name: "Automatic transfer switch (ATS), wiring, terminations",
+        quantity: 1,
+        unitCost: 1200,
+        unit: "Each",
+        labourUnit: 6,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Generator + ATS",
+      },
+      {
+        name: "Generator connection hardware and wiring",
+        quantity: 1,
+        unitCost: 850,
+        unit: "Each",
+        labourUnit: 4,
+        labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "Generator + ATS",
+      },
     ],
   },
 };

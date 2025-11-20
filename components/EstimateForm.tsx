@@ -1,3 +1,4 @@
+// components/EstimateForm.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -32,7 +33,6 @@ import Grid from "@mui/material/Grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 
-
 // ---- App imports ----
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { useEstimateData } from "@/components/providers/EstimateDataProvider";
@@ -48,9 +48,7 @@ import { jobPresets, type JobPresetKey } from "@/src/config/jobPresets";
 
 // ---- Helpers ----
 const lookupAddress = async (address: string) => {
-  if (!address) {
-    return;
-  }
+  if (!address) return;
   try {
     const resp = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
@@ -63,7 +61,7 @@ const lookupAddress = async (address: string) => {
         data.results[0].address_components as google.maps.GeocoderAddressComponent[];
       const get = (type: string) =>
         comps.find((c) => c.types.includes(type))?.short_name || "";
-      // You can wire city/province/postal from `get(...)` later
+      // City/province/postal could be wired from `get(...)` later
     }
   } catch (err) {
     console.error("Address lookup failed", err);
@@ -84,12 +82,14 @@ const formatCanadianPhone = (value: string) => {
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const unitDivisor = { Each: 1, C: 100, M: 1000 } as const;
+
 const workTypeOptions: WorkTypeOption[] = [
   "Select Type",
   "Residential",
   "Commercial",
   "Mixed",
 ];
+
 const defaultLabourRates: Record<
   Exclude<WorkTypeOption, "Select Type">,
   number
@@ -98,6 +98,7 @@ const defaultLabourRates: Record<
   Commercial: 145,
   Mixed: 145,
 };
+
 const isWorkType = (value: unknown): value is WorkTypeOption =>
   typeof value === "string" && workTypeOptions.includes(value as WorkTypeOption);
 
@@ -119,6 +120,8 @@ const EstimateForm = () => {
       unit: "Each",
       labourUnit: 0,
       labourUnitMultiplier: "Each",
+      groupIndex: 1,
+      groupTitle: "",
     },
   ]);
 
@@ -139,11 +142,9 @@ const EstimateForm = () => {
   const [startDate, setStartDate] = useState("");
   const [completionDate, setCompletionDate] = useState("");
   const [error, setError] = useState(false);
+
   const skipNextLabourAutoRef = useRef(false);
-
-// NEW: track if we've already hydrated from context / draft
-const hasHydratedRef = useRef(false);
-
+  const hasHydratedRef = useRef(false);
 
   const [selectedPreset, setSelectedPreset] = useState<JobPresetKey | "">("");
 
@@ -156,15 +157,7 @@ const hasHydratedRef = useRef(false);
   const { draft, saveDraft, clearDraft } = useEstimateDraft();
 
   // ---- Derived values ----
-  const customerValid =
-    fullName &&
-    address &&
-    projectName &&
-    projectDescription &&
-    contactMethod &&
-    phone &&
-    email &&
-    workType !== "Select Type";
+  const customerValid = workType !== "Select Type";
 
   const materialSum = rows.reduce(
     (sum, r) => sum + r.quantity * (r.unitCost / unitDivisor[r.unit]),
@@ -199,109 +192,127 @@ const hasHydratedRef = useRef(false);
   const depositNum = parseFloat(depositAmount) || 0;
   const balanceDue = estimateGrandTotal - depositNum;
 
-  // ---- Hydrate from context or draft ----
-useEffect(() => {
-  // If we've already hydrated once, don't do it again
-  if (hasHydratedRef.current) return;
+  // ---- Hydrate from context or draft (run once) ----
+  useEffect(() => {
+    if (hasHydratedRef.current) return;
 
-  // Prefer context (estimateData) if present (e.g., coming back from agreement page)
-  if (estimateData && estimateData.customer && estimateData.estimate) {
-    const c = estimateData.customer;
-    const e = estimateData.estimate;
+    // Prefer context (estimateData) if present
+    if (estimateData && estimateData.customer && estimateData.estimate) {
+      const c = estimateData.customer;
+      const e = estimateData.estimate;
 
-    setFullName(c.fullName || "");
-    setAddress(c.address || "");
-    setContactMethod(c.contactMethod || "");
-    setPhone(c.phone || "");
-    setEmail(c.email || "");
-    setProjectName(c.projectName || "");
-    setProjectDescription(c.projectDescription || "");
+      setFullName(c.fullName || "");
+      setAddress(c.address || "");
+      setContactMethod(c.contactMethod || "");
+      setPhone(c.phone || "");
+      setEmail(c.email || "");
+      setProjectName(c.projectName || "");
+      setProjectDescription(c.projectDescription || "");
 
-    setRows(
-      e.rows || [
-        {
-          name: "",
-          quantity: 0,
-          unitCost: 0,
-          unit: "Each",
-          labourUnit: 0,
-          labourUnitMultiplier: "Each",
-        },
-      ]
-    );
+      setRows(
+        (e.rows ||
+          [
+            {
+              name: "",
+              quantity: 0,
+              unitCost: 0,
+              unit: "Each",
+              labourUnit: 0,
+              labourUnitMultiplier: "Each",
+              groupIndex: 1,
+              groupTitle: "",
+            },
+          ]).map((r, i) => ({
+          ...r,
+          groupIndex: r.groupIndex ?? i + 1,
+          groupTitle: r.groupTitle ?? "",
+        }))
+      );
 
-    const storedWorkType = isWorkType(e.workType) ? e.workType : "Select Type";
-    if (storedWorkType !== "Select Type") {
-      skipNextLabourAutoRef.current = true;
+      const storedWorkType = isWorkType(e.workType)
+        ? e.workType
+        : "Select Type";
+      if (storedWorkType !== "Select Type") {
+        skipNextLabourAutoRef.current = true;
+      }
+      setWorkType(storedWorkType);
+
+      if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
+      if (typeof e.markup === "number") setMarkup(e.markup);
+      if (typeof e.overhead === "number") setOverhead(e.overhead);
+      if (typeof e.warranty === "number") setWarranty(e.warranty);
+      if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
+      if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
+      setDiscountType(e.discountType || "None");
+      if (typeof e.discountValue === "number")
+        setDiscountValue(e.discountValue);
+      setDepositAmount(e.depositAmount || "");
+      setDepositTouched(!!e.depositTouched);
+      setStartDate(e.startDate || "");
+      setCompletionDate(e.completionDate || "");
+
+      hasHydratedRef.current = true;
+      return;
     }
-    setWorkType(storedWorkType);
 
-    if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
-    if (typeof e.markup === "number") setMarkup(e.markup);
-    if (typeof e.overhead === "number") setOverhead(e.overhead);
-    if (typeof e.warranty === "number") setWarranty(e.warranty);
-    if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
-    if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
-    setDiscountType(e.discountType || "None");
-    if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
-    setDepositAmount(e.depositAmount || "");
-    setDepositTouched(!!e.depositTouched);
-    setStartDate(e.startDate || "");
-    setCompletionDate(e.completionDate || "");
+    // Otherwise hydrate from draft if available
+    if (draft && draft.customer && draft.estimate) {
+      const c = draft.customer;
+      const e = draft.estimate;
+
+      setFullName(c.fullName || "");
+      setAddress(c.address || "");
+      setContactMethod(c.contactMethod || "");
+      setPhone(c.phone || "");
+      setEmail(c.email || "");
+      setProjectName(c.projectName || "");
+      setProjectDescription(c.projectDescription || "");
+
+      setRows(
+        (e.rows ||
+          [
+            {
+              name: "",
+              quantity: 0,
+              unitCost: 0,
+              unit: "Each",
+              labourUnit: 0,
+              labourUnitMultiplier: "Each",
+              groupIndex: 1,
+              groupTitle: "",
+            },
+          ]).map((r, i) => ({
+          ...r,
+          groupIndex: r.groupIndex ?? i + 1,
+          groupTitle: r.groupTitle ?? "",
+        }))
+      );
+
+      const storedWorkType = isWorkType(e.workType)
+        ? e.workType
+        : "Select Type";
+      if (storedWorkType !== "Select Type") {
+        skipNextLabourAutoRef.current = true;
+      }
+      setWorkType(storedWorkType);
+
+      if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
+      if (typeof e.markup === "number") setMarkup(e.markup);
+      if (typeof e.overhead === "number") setOverhead(e.overhead);
+      if (typeof e.warranty === "number") setWarranty(e.warranty);
+      if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
+      if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
+      setDiscountType(e.discountType || "None");
+      if (typeof e.discountValue === "number")
+        setDiscountValue(e.discountValue);
+      setDepositAmount(e.depositAmount || "");
+      setDepositTouched(!!e.depositTouched);
+      setStartDate(e.startDate || "");
+      setCompletionDate(e.completionDate || "");
+    }
 
     hasHydratedRef.current = true;
-    return;
-  }
-
-  // If no context yet, hydrate from IndexedDB draft
-  if (draft && draft.customer && draft.estimate) {
-    const c = draft.customer;
-    const e = draft.estimate;
-
-    setFullName(c.fullName || "");
-    setAddress(c.address || "");
-    setContactMethod(c.contactMethod || "");
-    setPhone(c.phone || "");
-    setEmail(c.email || "");
-    setProjectName(c.projectName || "");
-    setProjectDescription(c.projectDescription || "");
-
-    setRows(
-      e.rows || [
-        {
-          name: "",
-          quantity: 0,
-          unitCost: 0,
-          unit: "Each",
-          labourUnit: 0,
-          labourUnitMultiplier: "Each",
-        },
-      ]
-    );
-
-    const storedWorkType = isWorkType(e.workType) ? e.workType : "Select Type";
-    if (storedWorkType !== "Select Type") {
-      skipNextLabourAutoRef.current = true;
-    }
-    setWorkType(storedWorkType);
-
-    if (typeof e.labourRate === "number") setLabourRate(e.labourRate);
-    if (typeof e.markup === "number") setMarkup(e.markup);
-    if (typeof e.overhead === "number") setOverhead(e.overhead);
-    if (typeof e.warranty === "number") setWarranty(e.warranty);
-    if (typeof e.esaFee === "number") setEsaFee(e.esaFee);
-    if (typeof e.hydroFee === "number") setHydroFee(e.hydroFee);
-    setDiscountType(e.discountType || "None");
-    if (typeof e.discountValue === "number") setDiscountValue(e.discountValue);
-    setDepositAmount(e.depositAmount || "");
-    setDepositTouched(!!e.depositTouched);
-    setStartDate(e.startDate || "");
-    setCompletionDate(e.completionDate || "");
-
-    hasHydratedRef.current = true;
-  }
-}, [estimateData, draft]);
-
+  }, [estimateData, draft]);
 
   // Auto-set labour rate on work type change
   useEffect(() => {
@@ -336,9 +347,22 @@ useEffect(() => {
 
     setRows((prev) => {
       if (!hasData && prev.length === 1) {
-        return preset.rows;
+        // Start at group 1 with preset's group info
+        return preset.rows.map((r) => ({
+          ...r,
+          groupIndex: r.groupIndex ?? 1,
+          groupTitle: r.groupTitle ?? preset.label,
+        }));
       }
-      return [...prev, ...preset.rows];
+      // Append rows after existing ones; keep groupIndex in preset
+      return [
+        ...prev,
+        ...preset.rows.map((r) => ({
+          ...r,
+          groupIndex: r.groupIndex ?? 1,
+          groupTitle: r.groupTitle ?? preset.label,
+        })),
+      ];
     });
 
     if (!projectName) {
@@ -358,111 +382,116 @@ useEffect(() => {
   };
 
   // ---- Draft persistence to IndexedDB ----
-useEffect(() => {
-  // Don't save until we've done the initial hydrate
-  if (!hasHydratedRef.current) return;
-  if (!customerValid) return;
+  useEffect(() => {
+    if (!hasHydratedRef.current) return;
+    if (!customerValid) return;
 
-  const submission: EstimateSubmission = {
-    date,
-    customer: {
-      fullName,
-      address,
-      projectName,
-      projectDescription,
-      contactMethod,
-      phone,
-      email,
-    },
-    estimate: {
-      workType,
-      labourRate,
-      rows,
-      markup,
-      overhead,
-      warranty,
-      esaFee,
-      hydroFee,
-      startDate,
-      completionDate,
-      depositAmount,
-      depositTouched,
-      discountType,
-      discountValue,
-      totals: {
-        materialSum,
-        labourExtensionSum,
-        totalLabourCost,
-        totalMaterial,
-        baseCost,
-        markupAmt,
-        overheadAmt,
-        cost,
-        warrantyAmt,
-        discountAmt,
-        estimateTotal,
-        estimateGrandTotal,
-        estimateTax,
+    const submission: EstimateSubmission = {
+      date,
+      customer: {
+        fullName,
+        address,
+        projectName,
+        projectDescription,
+        contactMethod,
+        phone,
+        email,
       },
-    },
-  };
+      estimate: {
+        workType,
+        labourRate,
+        rows,
+        markup,
+        overhead,
+        warranty,
+        esaFee,
+        hydroFee,
+        startDate,
+        completionDate,
+        depositAmount,
+        depositTouched,
+        discountType,
+        discountValue,
+        totals: {
+          materialSum,
+          labourExtensionSum,
+          totalLabourCost,
+          totalMaterial,
+          baseCost,
+          markupAmt,
+          overheadAmt,
+          cost,
+          warrantyAmt,
+          discountAmt,
+          estimateTotal,
+          estimateGrandTotal,
+          estimateTax,
+        },
+      },
+    };
 
-  // Fire-and-forget; errors are logged inside the hook utilities
-  saveDraft(submission);
-}, [
-  customerValid,
-  date,
-  fullName,
-  address,
-  projectName,
-  projectDescription,
-  contactMethod,
-  phone,
-  email,
-  workType,
-  labourRate,
-  rows,
-  markup,
-  overhead,
-  warranty,
-  esaFee,
-  hydroFee,
-  startDate,
-  completionDate,
-  depositAmount,
-  depositTouched,
-  discountType,
-  discountValue,
-  materialSum,
-  labourExtensionSum,
-  totalLabourCost,
-  totalMaterial,
-  baseCost,
-  markupAmt,
-  overheadAmt,
-  cost,
-  warrantyAmt,
-  discountAmt,
-  estimateTotal,
-  estimateGrandTotal,
-  estimateTax,
-  saveDraft,
-]);
-
+    saveDraft(submission);
+  }, [
+    customerValid,
+    date,
+    fullName,
+    address,
+    projectName,
+    projectDescription,
+    contactMethod,
+    phone,
+    email,
+    workType,
+    labourRate,
+    rows,
+    markup,
+    overhead,
+    warranty,
+    esaFee,
+    hydroFee,
+    startDate,
+    completionDate,
+    depositAmount,
+    depositTouched,
+    discountType,
+    discountValue,
+    materialSum,
+    labourExtensionSum,
+    totalLabourCost,
+    totalMaterial,
+    baseCost,
+    markupAmt,
+    overheadAmt,
+    cost,
+    warrantyAmt,
+    discountAmt,
+    estimateTotal,
+    estimateGrandTotal,
+    estimateTax,
+    saveDraft,
+  ]);
 
   // ---- Row helpers ----
   const addRow = () => {
-    setRows((r) => [
-      ...r,
-      {
-        name: "",
-        quantity: 0,
-        unitCost: 0,
-        unit: "Each",
-        labourUnit: 0,
-        labourUnitMultiplier: "Each",
-      },
-    ]);
+    setRows((prev) => {
+      const last = prev[prev.length - 1];
+      const nextGroupIndex = last ? last.groupIndex : 1;
+      const nextGroupTitle = last ? last.groupTitle : "";
+
+      return [
+        ...prev,
+        {
+          name: "",
+          quantity: 0,
+          unitCost: 0,
+          unit: "Each",
+          labourUnit: 0,
+          labourUnitMultiplier: "Each",
+          groupIndex: nextGroupIndex,
+          groupTitle: nextGroupTitle,
+        },
+      ];
+    });
   };
 
   const removeRow = (idx: number) => {
@@ -470,7 +499,7 @@ useEffect(() => {
   };
 
   const updateRow = (idx: number, row: Partial<EstimateRow>) => {
-    setRows((r) => (r.map((item, i) => (i === idx ? { ...item, ...row } : item))));
+    setRows((r) => r.map((item, i) => (i === idx ? { ...item, ...row } : item)));
   };
 
   // ---- Submit / Cancel ----
@@ -539,22 +568,30 @@ useEffect(() => {
     setEstimateData(data);
     setAgreementData(agreementPayload);
 
-    // Try to send to API; if it fails, log it but still move on
     try {
-      await fetch("/api/estimates", {
+      const res = await fetch("/api/estimates", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          status: "ready_for_review",
+        }),
       });
-      // Optionally clear draft once server has it
-      // await clearDraft();
+
+      const json = await res.json();
+      if (!res.ok || !json.estimateId) {
+        console.error("Failed to save estimate", json);
+        // You can surface a toast/snackbar here later
+        return;
+      }
+
+      const estimateId = json.estimateId as string;
+      router.push(`/estimates/review/${estimateId}`);
     } catch (err) {
       console.error("Failed to save estimate via API", err);
     }
-
-    router.push("/agreement");
   };
 
   const handleCancel = () => {
@@ -573,6 +610,8 @@ useEffect(() => {
         unit: "Each",
         labourUnit: 0,
         labourUnitMultiplier: "Each",
+        groupIndex: 1,
+        groupTitle: "",
       },
     ]);
     setWorkType("Select Type");
@@ -612,7 +651,7 @@ useEffect(() => {
                 label="Project Name"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
-                required
+                
                 fullWidth
               />
             </Grid>
@@ -624,7 +663,7 @@ useEffect(() => {
                 label="Project Description"
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
-                required
+                
                 fullWidth
                 multiline
                 minRows={3}
@@ -637,7 +676,7 @@ useEffect(() => {
               label="Project Start Date"
               type="date"
               value={startDate}
-              required
+              
               fullWidth
               onChange={(e) => setStartDate(e.target.value)}
               InputLabelProps={{ shrink: true }}
@@ -647,7 +686,7 @@ useEffect(() => {
               label="Project Completion Date"
               type="date"
               value={completionDate}
-              required
+              
               fullWidth
               onChange={(e) => setCompletionDate(e.target.value)}
               InputLabelProps={{ shrink: true }}
@@ -664,7 +703,7 @@ useEffect(() => {
                 label="Full Name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                required
+                
                 fullWidth
               />
             </Grid>
@@ -703,7 +742,7 @@ useEffect(() => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 onBlur={(e) => setPhone(formatCanadianPhone(e.target.value))}
-                required
+                
                 fullWidth
                 type="tel"
                 inputProps={{
@@ -716,7 +755,7 @@ useEffect(() => {
                 label="Email"
                 type="email"
                 value={email}
-                required
+                
                 fullWidth
                 error={error}
                 helperText={error ? "Invalid email address" : ""}
@@ -739,7 +778,7 @@ useEffect(() => {
               spacing={2}
               alignItems="center"
             >
-              <FormControl fullWidth required sx={{ mb: { xs: 2, sm: 3 } }}>
+              <FormControl fullWidth  sx={{ mb: { xs: 2, sm: 3 } }}>
                 <InputLabel id="wt">Work Type</InputLabel>
                 <Select
                   labelId="wt"
@@ -798,9 +837,7 @@ useEffect(() => {
                     Basement Renovation (Basic)
                   </MenuItem>
                   <MenuItem value="tesla_charger">Tesla EV Charger</MenuItem>
-                  <MenuItem value="generator_install">
-                    Generator + ATS
-                  </MenuItem>
+                  <MenuItem value="generator_install">Generator + ATS</MenuItem>
                 </Select>
               </FormControl>
             </Stack>
@@ -822,21 +859,23 @@ useEffect(() => {
                       return (
                         <React.Fragment key={`row-${idx}`}>
                           <TableRow>
-                            <TableCell colSpan={9} sx={{ p: 0 }}>
+                            <TableCell colSpan={11} sx={{ p: 0 }}>
                               <TextField
                                 size="small"
-                                label="Material Name"
+                                label="Material Name / Description"
                                 fullWidth
                                 value={row.name}
                                 onChange={(e) =>
                                   updateRow(idx, { name: e.target.value })
                                 }
-                                required
+                                
                                 inputProps={{ maxLength: 255 }}
                               />
                             </TableCell>
                           </TableRow>
                           <TableRow>
+                            <TableCell>Group #</TableCell>
+                            <TableCell>Group Title</TableCell>
                             <TableCell>Material Quantity</TableCell>
                             <TableCell>Material Unit Cost</TableCell>
                             <TableCell>Material Unit Multiplier</TableCell>
@@ -848,7 +887,41 @@ useEffect(() => {
                             <TableCell />
                           </TableRow>
                           <TableRow>
+                            {/* Group # */}
                             <TableCell sx={{ pl: 0 }}>
+                              <TextField
+                                size="small"
+                                type="number"
+                                label="Grp"
+                                value={row.groupIndex ?? 1}
+                                onChange={(e) =>
+                                  updateRow(idx, {
+                                    groupIndex: Math.max(
+                                      1,
+                                      Number(e.target.value) || 1
+                                    ),
+                                  })
+                                }
+                                inputProps={{ min: 1 }}
+                              />
+                            </TableCell>
+
+                            {/* Group Title */}
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                label="Title"
+                                value={row.groupTitle ?? ""}
+                                onChange={(e) =>
+                                  updateRow(idx, {
+                                    groupTitle: e.target.value,
+                                  })
+                                }
+                              />
+                            </TableCell>
+
+                            {/* Quantity */}
+                            <TableCell>
                               <TextField
                                 size="small"
                                 type="number"
@@ -860,6 +933,8 @@ useEffect(() => {
                                 }
                               />
                             </TableCell>
+
+                            {/* Unit Cost */}
                             <TableCell>
                               <TextField
                                 size="small"
@@ -873,6 +948,7 @@ useEffect(() => {
                               />
                             </TableCell>
 
+                            {/* Material Unit Multiplier */}
                             <TableCell>
                               <Select
                                 size="small"
@@ -888,7 +964,11 @@ useEffect(() => {
                                 <MenuItem value="M">M</MenuItem>
                               </Select>
                             </TableCell>
+
+                            {/* Material Extension */}
                             <TableCell>{materialExt.toFixed(2)}</TableCell>
+
+                            {/* Labour Unit */}
                             <TableCell>
                               <TextField
                                 size="small"
@@ -901,6 +981,8 @@ useEffect(() => {
                                 }
                               />
                             </TableCell>
+
+                            {/* Labour Unit Multiplier */}
                             <TableCell>
                               <Select
                                 size="small"
@@ -917,8 +999,13 @@ useEffect(() => {
                                 <MenuItem value="M">M</MenuItem>
                               </Select>
                             </TableCell>
+
+                            {/* Labour Extension */}
                             <TableCell>{labourExt.toFixed(2)}</TableCell>
+
+                            {/* Labour Cost */}
                             <TableCell>{lc.toFixed(2)}</TableCell>
+
                             <TableCell>
                               <IconButton onClick={() => removeRow(idx)}>
                                 <DeleteIcon />
@@ -926,7 +1013,7 @@ useEffect(() => {
                             </TableCell>
                           </TableRow>
                           <TableRow>
-                            <TableCell colSpan={9} sx={{ px: 0 }}>
+                            <TableCell colSpan={11} sx={{ px: 0 }}>
                               <Divider
                                 sx={{
                                   borderBottom: "2px solid blue",
@@ -941,7 +1028,7 @@ useEffect(() => {
                   </TableBody>
                   <TableFooter>
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={5}>
                         <Typography fontWeight="bold">
                           Total Material Cost
                         </Typography>
@@ -954,7 +1041,7 @@ useEffect(() => {
                       <TableCell colSpan={5} />
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={5}>
                         <Typography fontWeight="bold">
                           Total Labour Extension
                         </Typography>
@@ -968,7 +1055,7 @@ useEffect(() => {
                       <TableCell colSpan={2} />
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={5}>
                         <Typography fontWeight="bold">
                           Total Labour Cost
                         </Typography>
@@ -982,7 +1069,7 @@ useEffect(() => {
                       <TableCell />
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={5}>
                         <Typography variant="h6" fontWeight="bold">
                           Total Cost
                         </Typography>

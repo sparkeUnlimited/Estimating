@@ -87,7 +87,7 @@ export default function AddressAutocomplete({
           onChange(newInput);
         }
       }}
-      renderInput={(params) => <TextField {...params} label={label} required />}
+      renderInput={(params) => <TextField {...params} label={label}  />}
     />
   );
 }
